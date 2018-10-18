@@ -12,6 +12,7 @@ const refresh = require("passport-oauth2-refresh");
 const { decodeOpaqueId } = require("lib/utils/decoding");
 const { appPath, dev } = require("./config");
 const router = require("./routes");
+const redirects = require("./redirects");
 
 const app = nextApp({ dir: appPath, dev });
 const routeHandler = router.getRequestHandler(app);
@@ -50,6 +51,19 @@ passport.deserializeUser((user, done) => {
   done(null, JSON.parse(user));
 });
 
+const redirectMiddlewre = (req, res, next) => {
+  const pageURL = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
+  const redirect = redirects[pageURL];
+
+  if (redirect && (pageURL !== redirect.url)) {
+    res.writeHead(redirect.status, {
+      Location: redirect.url
+    });
+    return res.end();
+  }
+  return next();
+};
+
 app
   .prepare()
   .then(() => {
@@ -74,6 +88,7 @@ app
     server.use(passport.initialize());
     server.use(passport.session());
     server.use(cookieParser());
+    server.use(redirectMiddlewre);
 
     server.get("/signin", (req, res, next) => {
       req.session.redirectTo = req.get("Referer");
