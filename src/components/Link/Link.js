@@ -6,6 +6,8 @@ import classNames from "classnames";
 import { withStyles } from "@material-ui/core/styles";
 import track from "lib/tracking/track";
 
+const disableSPA = true; // This would come from configuration
+
 const styles = () => ({
   anchor: {
     color: "inherit",
@@ -56,6 +58,19 @@ class Link extends Component {
       onClick,
       ...props
     } = this.props;
+
+    if (disableSPA) {
+      return (
+        <a
+          href={props.route || props.href}
+          className={classNames(classes.anchor, className)}
+          onClick={this.handleClick}
+          onKeyDown={this.handleKeyDown}
+        >
+          {children}
+        </a>
+      );
+    }
 
     return (
       <NextLink route={props.route || props.href} {...props} passHref>
