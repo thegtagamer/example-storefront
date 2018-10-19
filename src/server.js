@@ -1,3 +1,4 @@
+const url = require("url");
 const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
 const express = require("express");
@@ -52,16 +53,17 @@ passport.deserializeUser((user, done) => {
 });
 
 const redirectMiddlewre = (req, res, next) => {
-  const pageURL = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
-  const redirect = redirects[pageURL];
+  const path = url.parse(req.url).pathname.replace(/\/$/, "");
+  const redirect = redirects[path];
 
-  if (redirect && (pageURL !== redirect.url)) {
-    res.writeHead(redirect.status, {
-      Location: redirect.url
-    });
-    return res.end();
-  }
-  return next();
+  // If no redirect necessary, continue along as normal
+  if (!redirect || (path === redirect.url)) return next();
+
+  // Redirect to specified url
+  res.writeHead(redirect.status, {
+    Location: redirect.url
+  });
+  return res.end();
 };
 
 app
