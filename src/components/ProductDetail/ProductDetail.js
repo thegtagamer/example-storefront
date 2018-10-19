@@ -89,7 +89,7 @@ class ProductDetail extends Component {
     Router.pushRoute("product", {
       slugOrId: product.slug,
       variantId: selectOptionId || variantId
-    });
+    }, { forceSPALinks: true });
   }
 
   @trackProduct()
