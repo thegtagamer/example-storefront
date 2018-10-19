@@ -1,5 +1,25 @@
 const routes = require("next-routes")();
 
+const disableSPALinks = true;
+
+const wrap = (method) => (route, params, options) => {
+  const { byName, urls: { as, href } } = routes.findAndGetUrls(route, params);
+
+  // Force full page loads
+  if (disableSPALinks && !options.forceSPALinks) {
+    window.location = as;
+    return as;
+  }
+
+  // History pushstate
+  return routes.Router[method](href, as, byName ? options : params);
+};
+
+// Override router push methods
+routes.Router.pushRoute = wrap("push");
+routes.Router.replaceRoute = wrap("replace");
+routes.Router.prefetchRoute = wrap("prefetch");
+
 routes
   .add("home", "/", "productGrid")
   .add("cart", "/cart", "cart")
