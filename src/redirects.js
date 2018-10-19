@@ -1,4 +1,8 @@
 module.exports = {
+  "/shirts": {
+    status: 302,
+    url: "/tag/t-shirts"
+  },
   "/tag/bags": {
     status: 302,
     url: "/product/brown-rattan-crossbody-bag/cmVhY3Rpb24vY2F0YWxvZ1Byb2R1Y3RWYXJpYW50OjhiUllTUnd5enRwcUtzZDhp"
