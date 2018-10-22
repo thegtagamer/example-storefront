@@ -1,12 +1,11 @@
 const routes = require("next-routes")();
-
-const disableSPALinks = true;
+const config = require("./config");
 
 const wrap = (method) => (route, params, options) => {
   const { byName, urls: { as, href } } = routes.findAndGetUrls(route, params);
 
   // Force full page loads
-  if (disableSPALinks && !options.forceSPALinks) {
+  if (!config.enableSPARouting && !options.forceSPALinks) {
     window.location = as;
     return as;
   }
