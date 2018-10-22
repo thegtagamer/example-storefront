@@ -4,7 +4,7 @@ const cookieSession = require("cookie-session");
 const express = require("express");
 const compression = require("compression");
 const nextApp = require("next");
-const request = require("request");
+const axios = require("axios");
 const { useStaticRendering } = require("mobx-react");
 const logger = require("lib/logger");
 const passport = require("passport");
@@ -13,7 +13,6 @@ const refresh = require("passport-oauth2-refresh");
 const { decodeOpaqueId } = require("lib/utils/decoding");
 const { appPath, dev } = require("./config");
 const router = require("./routes");
-const redirects = require("./redirects");
 
 const app = nextApp({ dir: appPath, dev });
 const routeHandler = router.getRequestHandler(app);
@@ -52,22 +51,40 @@ passport.deserializeUser((user, done) => {
   done(null, JSON.parse(user));
 });
 
+const redirectRules = {};
 const redirectMiddlewre = (req, res, next) => {
   const path = url.parse(req.url).pathname.replace(/\/$/, "");
-  const redirect = redirects[path];
+  const rule = redirectRules[path];
 
   // If no redirect necessary, continue along as normal
-  if (!redirect || (path === redirect.url)) return next();
+  if (!rule || (path === rule.to)) return next();
 
   // Redirect to specified url
-  res.writeHead(redirect.status, {
-    Location: redirect.url
+  res.writeHead(rule.status, {
+    Location: rule.to
   });
   return res.end();
 };
 
 app
   .prepare()
+  .then(() => (
+    axios.post(process.env.INTERNAL_GRAPHQL_URL, {
+      query: "query { redirectRules { status from to } }",
+      variables: null
+    })
+      .then((res) => {
+        const rules = res.data.data.redirectRules;
+        for (const rule of rules) {
+          redirectRules[rule.from] = rule;
+        }
+        return res;
+      })
+      .catch((err) => {
+        logger.error("Redirect rule request failed", err);
+        throw err;
+      })
+  ))
   .then(() => {
     const server = express();
 
@@ -110,12 +127,12 @@ app
 
     server.get("/logout/:userId", (req, res) => {
       const { id } = decodeOpaqueId(req.params.userId);
-      request(`${process.env.OAUTH2_IDP_HOST_URL}logout?userId=${id}`, (error) => {
-        if (!error) {
+      axios.get(`${process.env.OAUTH2_IDP_HOST_URL}logout?userId=${id}`)
+        .then(() => {
           req.logout();
-          res.redirect(req.get("Referer") || "/");
-        }
-      });
+          return res.redirect(req.get("Referer") || "/");
+        })
+        .catch(() => {});
     });
 
     // Setup next routes
