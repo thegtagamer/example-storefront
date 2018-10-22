@@ -42,6 +42,7 @@
     "apollo-link-context": "^1.0.8",
     "apollo-link-error": "^1.0.9",
     "apollo-link-http": "^1.5.4",
+    "axios": "^0.18.0",
     "body-parser": "^1.18.2",
     "chalk": "^2.3.2",
     "classnames": "^2.2.5",
@@ -71,7 +72,6 @@
     "react-stripe-elements": "^2.0.1",
     "react-tracking": "^5.4.1",
     "reacto-form": "^0.0.2",
-    "request": "^2.88.0",
     "styled-components": "^3.4.9"
   },
   "devDependencies": {

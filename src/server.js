@@ -4,7 +4,7 @@ const cookieSession = require("cookie-session");
 const express = require("express");
 const compression = require("compression");
 const nextApp = require("next");
-const request = require("request");
+const axios = require("axios");
 const { useStaticRendering } = require("mobx-react");
 const logger = require("lib/logger");
 const passport = require("passport");
@@ -110,12 +110,12 @@ app
 
     server.get("/logout/:userId", (req, res) => {
       const { id } = decodeOpaqueId(req.params.userId);
-      request(`${process.env.OAUTH2_IDP_HOST_URL}logout?userId=${id}`, (error) => {
-        if (!error) {
+      axios.get(`${process.env.OAUTH2_IDP_HOST_URL}logout?userId=${id}`)
+        .then(() => {
           req.logout();
-          res.redirect(req.get("Referer") || "/");
-        }
-      });
+          return res.redirect(req.get("Referer") || "/");
+        })
+        .catch(() => {});
     });
 
     // Setup next routes
