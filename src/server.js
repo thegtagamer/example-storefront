@@ -125,14 +125,16 @@ app
       res.redirect(req.session.redirectTo || "/");
     });
 
-    server.get("/logout/:userId", (req, res) => {
+    server.get("/logout/:userId", async (req, res) => {
       const { id } = decodeOpaqueId(req.params.userId);
-      axios.get(`${process.env.OAUTH2_IDP_HOST_URL}logout?userId=${id}`)
-        .then(() => {
-          req.logout();
-          return res.redirect(req.get("Referer") || "/");
-        })
-        .catch(() => {});
+
+      try {
+        await axios.get(`${process.env.OAUTH2_IDP_HOST_URL}logout?userId=${id}`)
+        req.logout();
+        return res.redirect(req.get("Referer") || "/");
+      } catch (err) {
+        res.next(err);
+      }
     });
 
     // Setup next routes
