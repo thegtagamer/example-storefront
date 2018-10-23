@@ -75,7 +75,7 @@ const fetchRouteManifest = async () => {
 
   try {
     const res = await axios.post(process.env.INTERNAL_GRAPHQL_URL, {
-      query: "query { redirectRules { status from to } }",
+      query: "query { redirectRules(enabled: true) { status from to } }",
       variables: null
     });
 
