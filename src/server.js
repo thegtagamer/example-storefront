@@ -140,7 +140,7 @@ app
       const { id } = decodeOpaqueId(req.params.userId);
 
       try {
-        await axios.get(`${process.env.OAUTH2_IDP_HOST_URL}logout?userId=${id}`)
+        await axios.get(`${process.env.OAUTH2_IDP_HOST_URL}logout?userId=${id}`);
         req.logout();
         return res.redirect(req.get("Referer") || "/");
       } catch (err) {
