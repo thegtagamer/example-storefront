@@ -11,7 +11,7 @@ const passport = require("passport");
 const OAuth2Strategy = require("passport-oauth2");
 const refresh = require("passport-oauth2-refresh");
 const { decodeOpaqueId } = require("lib/utils/decoding");
-const { appPath, dev } = require("./config");
+const { appPath, dev, enableRedirects } = require("./config");
 const router = require("./routes");
 
 const app = nextApp({ dir: appPath, dev });
@@ -66,25 +66,33 @@ const redirectMiddlewre = (req, res, next) => {
   return res.end();
 };
 
-app
-  .prepare()
-  .then(() => (
-    axios.post(process.env.INTERNAL_GRAPHQL_URL, {
+/**
+ * Fetches a full manifest of redirects from a GraphQL endpoint
+ * @returns {Promise} a promise containing the response from the GQL request
+ */
+const fetchRouteManifest = async () => {
+  if (enableRedirects === false) return Promise.resolve();
+
+  try {
+    const res = await axios.post(process.env.INTERNAL_GRAPHQL_URL, {
       query: "query { redirectRules { status from to } }",
       variables: null
-    })
-      .then((res) => {
-        const rules = res.data.data.redirectRules;
-        for (const rule of rules) {
-          redirectRules[rule.from] = rule;
-        }
-        return res;
-      })
-      .catch((err) => {
-        logger.error("Redirect rule request failed", err);
-        throw err;
-      })
-  ))
+    });
+
+    const rules = res.data.data.redirectRules;
+    for (const rule of rules) {
+      redirectRules[rule.from] = rule;
+    }
+    return res;
+  } catch (err) {
+    logger.error("Redirect rule request failed", err);
+    throw err;
+  }
+};
+
+app
+  .prepare()
+  .then(fetchRouteManifest)
   .then(() => {
     const server = express();
 
@@ -107,7 +115,10 @@ app
     server.use(passport.initialize());
     server.use(passport.session());
     server.use(cookieParser());
-    server.use(redirectMiddlewre);
+
+    if (enableRedirects) {
+      server.use(redirectMiddlewre);
+    }
 
     server.get("/signin", (req, res, next) => {
       req.session.redirectTo = req.get("Referer");
