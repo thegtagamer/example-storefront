@@ -52,7 +52,7 @@ passport.deserializeUser((user, done) => {
 });
 
 const redirectRules = {};
-const redirectMiddlewre = (req, res, next) => {
+const redirectMiddleware = (req, res, next) => {
   const path = url.parse(req.url).pathname.replace(/\/$/, "");
   const rule = redirectRules[path];
 
@@ -117,7 +117,7 @@ app
     server.use(cookieParser());
 
     if (enableRedirects) {
-      server.use(redirectMiddlewre);
+      server.use(redirectMiddleware);
     }
 
     server.get("/signin", (req, res, next) => {
