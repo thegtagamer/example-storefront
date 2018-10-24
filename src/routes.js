@@ -1,23 +1,27 @@
 const routes = require("next-routes")();
-const config = require("./config");
+const getConfig = require("next/config").default;
 
-const wrap = (method) => (route, params, options) => {
-  const { byName, urls: { as, href } } = routes.findAndGetUrls(route, params);
+if (process.browser) {
+  const { publicRuntimeConfig } = getConfig();
 
-  // Force full page loads
-  if (!config.enableSPARouting && !options.forceSPALinks) {
-    window.location = as;
-    return as;
-  }
+  const wrap = (method) => (route, params, options) => {
+    const { byName, urls: { as, href } } = routes.findAndGetUrls(route, params);
 
-  // History pushstate
-  return routes.Router[method](href, as, byName ? options : params);
-};
+    // Force full page loads
+    if (!publicRuntimeConfig.enableSPARouting && !options.forceSPALinks) {
+      window.location = as;
+      return as;
+    }
 
-// Override router push methods
-routes.Router.pushRoute = wrap("push");
-routes.Router.replaceRoute = wrap("replace");
-routes.Router.prefetchRoute = wrap("prefetch");
+    // History pushstate
+    return routes.Router[method](href, as, byName ? options : params);
+  };
+
+  // Override router push methods
+  routes.Router.pushRoute = wrap("push");
+  routes.Router.replaceRoute = wrap("replace");
+  routes.Router.prefetchRoute = wrap("prefetch");
+}
 
 routes
   .add("home", "/", "productGrid")
