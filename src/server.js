@@ -51,19 +51,24 @@ passport.deserializeUser((user, done) => {
   done(null, JSON.parse(user));
 });
 
+const redirectRules = {};
 /**
  * Fetches redirect rules for a given route from a GraphQL endpoint
  * @param {String} path - path of the route to fetch
  * @returns {Promise<Array<Object>>} a promise containing the response from the GQL request
  */
 const fetchRouteRule = async (path) => {
+  if (redirectRules[path]) return redirectRules[path];
+
   try {
     const res = await axios.post(process.env.INTERNAL_GRAPHQL_URL, {
       query: `query { redirectRules(enabled: true, from: "${path}") { status from to } }`,
       variables: { enabled: true, from: path }
     });
     const rules = res.data.data.redirectRules;
-    return (rules && rules.length) ? rules[0] : null;
+    const rule = (rules && rules.length) ? rules[0] : null;
+    redirectRules[path] = rule;
+    return rule;
   } catch (ex) {
     return null;
   }
