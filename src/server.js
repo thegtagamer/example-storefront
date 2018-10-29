@@ -83,7 +83,7 @@ const redirectMiddleware = async (req, res, next) => {
 
   // Redirect to specified url
   res.writeHead(rule.status, {
-    Location: rule.to
+    Location: req.url.replace(path, rule.to)
   });
   return res.end();
 };
