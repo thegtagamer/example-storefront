@@ -62,7 +62,7 @@ const fetchRouteRule = async (path) => {
 
   try {
     const res = await axios.post(process.env.INTERNAL_GRAPHQL_URL, {
-      query: `query { redirectRules(enabled: true, from: "${path}") { status from to } }`,
+      query: `query { redirectRules(enabled: true, from: "${path}") { from to status } }`,
       variables: { enabled: true, from: path }
     });
     const rules = res.data.data.redirectRules;
@@ -76,6 +76,7 @@ const fetchRouteRule = async (path) => {
 
 const redirectMiddleware = async (req, res, next) => {
   const path = url.parse(req.url).pathname.replace(/\/$/, "");
+  if (path.startsWith("/_next/") || path.startsWith("/static/")) return next();
   const rule = await fetchRouteRule(path);
 
   // If no redirect necessary, continue along as normal
@@ -113,10 +114,6 @@ app
     server.use(passport.session());
     server.use(cookieParser());
 
-    if (enableRedirects) {
-      server.use(redirectMiddleware);
-    }
-
     server.get("/signin", (req, res, next) => {
       req.session.redirectTo = req.get("Referer");
       next(); // eslint-disable-line promise/no-callback-in-promise
@@ -144,6 +141,10 @@ app
         res.next(err);
       }
     });
+
+    if (enableRedirects) {
+      server.use(redirectMiddleware);
+    }
 
     // Setup next routes
     server.use(routeHandler);
