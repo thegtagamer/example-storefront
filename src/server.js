@@ -1,4 +1,3 @@
-const url = require("url");
 const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
 const express = require("express");
@@ -11,7 +10,7 @@ const passport = require("passport");
 const OAuth2Strategy = require("passport-oauth2");
 const refresh = require("passport-oauth2-refresh");
 const { decodeOpaqueId } = require("lib/utils/decoding");
-const { appPath, dev, enableRedirects } = require("./config");
+const { appPath, dev } = require("./config");
 const router = require("./routes");
 
 const app = nextApp({ dir: appPath, dev });
@@ -50,44 +49,6 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser((user, done) => {
   done(null, JSON.parse(user));
 });
-
-const redirectRules = {};
-/**
- * Fetches redirect rules for a given route from a GraphQL endpoint
- * @param {String} path - path of the route to fetch
- * @returns {Promise<Array<Object>>} a promise containing the response from the GQL request
- */
-const fetchRouteRule = async (path) => {
-  if (redirectRules[path]) return redirectRules[path];
-
-  try {
-    const res = await axios.post(process.env.INTERNAL_GRAPHQL_URL, {
-      query: `query { redirectRules(enabled: true, from: "${path}") { from to status } }`,
-      variables: { enabled: true, from: path }
-    });
-    const rules = res.data.data.redirectRules;
-    const rule = (rules && rules.length) ? rules[0] : null;
-    redirectRules[path] = rule;
-    return rule;
-  } catch (ex) {
-    return null;
-  }
-};
-
-const redirectMiddleware = async (req, res, next) => {
-  const path = url.parse(req.url).pathname.replace(/\/$/, "");
-  if (path.startsWith("/_next/") || path.startsWith("/static/")) return next();
-  const rule = await fetchRouteRule(path);
-
-  // If no redirect necessary, continue along as normal
-  if (!rule || (path === rule.to)) return next();
-
-  // Redirect to specified url
-  res.writeHead(rule.status, {
-    Location: req.url.replace(path, rule.to)
-  });
-  return res.end();
-};
 
 app
   .prepare()
@@ -141,10 +102,6 @@ app
         res.next(err);
       }
     });
-
-    if (enableRedirects) {
-      server.use(redirectMiddleware);
-    }
 
     // Setup next routes
     server.use(routeHandler);
