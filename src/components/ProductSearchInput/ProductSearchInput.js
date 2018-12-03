@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Field from "@reactioncommerce/components/Field/v1";
 import TextInput from "@reactioncommerce/components/TextInput/v1";
-import { productsBySearch } from "./queries.gql";
+import { catalogBySearch } from "./queries.gql";
 import withApolloSearchClient from "lib/apollo-search/withApolloSearchClient";
+import { Query } from "react-apollo";
 
 @withApolloSearchClient
 export default class ProductSearchInput extends Component {
@@ -28,23 +29,25 @@ export default class ProductSearchInput extends Component {
 
     return (
       <div>
-        <Field
-          name="product-search"
-          label="Search"
-          helpText="What are you looking for?"
-          labelFor="query"
+        <Query
+          query={catalogBySearch}
+          variables={variables}
+          client={this.props.searchClient}
         >
-          <TextInput id="query" name="query" placeholder="" />
-        </Field>
+          {({ loading: isLoading, data: results }) => {
+            return (
+              <Field
+                name="product-search"
+                label="Search"
+                helpText="What are you looking for?"
+                labelFor="query"
+              >
+                <TextInput id="query" name="query" placeholder="" />
+              </Field>
+            );
+          }}
+        </Query>
       </div>
     );
   }
 }
-/*
-
-             <Query query={catalogBySearch} variables={variables} client={this.props.searchClient}>
-  {({ loading: isLoading, data: results }) => {
-    return ();
-  }}
-</Query>
-*/
