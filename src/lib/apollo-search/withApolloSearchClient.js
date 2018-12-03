@@ -21,30 +21,32 @@ function getComponentDisplayName(Component) {
 }
 
 /**
- * @name withApolloClient
+ * @name withApolloSearchClient
  * @summary Wraps the component with a configured Apollo client provider
  * @param {React.Component} WrappedComponent Component to wrap
  * @returns {React.Component} Higher order component
  */
-export default function withApolloClient(WrappedComponent) {
-  class WithApolloClient extends React.Component {
+export default function withApolloSearchClient(WrappedComponent) {
+  class WithApolloSearchClient extends React.Component {
     static async getInitialProps(ctx) {
-      const { Component, router, ctx: { req, res, query, pathname } } = ctx;
+      // const { Component, router, ctx: { req, res, query, pathname } } = ctx;
+      const { Component } = ctx;
 
       // Provide the `url` prop data in case a GraphQL query uses it
       // rootMobxStores.routingStore.updateRoute({ query, pathname });
 
-      let user;
-      try {
-        const userString = req && req.session && req.session.passport && req.session.passport.user;
-        user = userString && JSON.parse(userString);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.log("Error parsing user object. Check passport session configuration", error);
-      }
+      // let user;
+      // try {
+      //   const userString = req && req.session && req.session.passport && req.session.passport.user;
+      //   user = userString && JSON.parse(userString);
+      // } catch (error) {
+      //   // eslint-disable-next-line no-console
+      //   console.log("Error parsing user object. Check passport session configuration", error);
+      // }
 
       // const apollo = initApollo({ cookies: req && req.cookies }, { accessToken: user && user.accessToken });
       const apollo = initApollo();
+      console.log("HEY getInitialProps apollo", apollo); // fixme
 
       ctx.ctx.apolloSearchClient = apollo;
 
@@ -53,11 +55,11 @@ export default function withApolloClient(WrappedComponent) {
         wrappedComponentProps = await WrappedComponent.getInitialProps(ctx);
       }
 
-      if (res && res.finished) {
-        // When redirecting, the response is finished.
-        // No point in continuing to render
-        return {};
-      }
+      // if (res && res.finished) {
+      //   // When redirecting, the response is finished.
+      //   // No point in continuing to render
+      //   return {};
+      // }
 
       const apolloState = {};
       console.log("HEY checking !process.browser"); // fixme
@@ -112,7 +114,7 @@ export default function withApolloClient(WrappedComponent) {
       };
     }
 
-    static displayName = `WithApolloClient(${getComponentDisplayName(WrappedComponent)})`;
+    static displayName = `WithApolloSearchClient(${getComponentDisplayName(WrappedComponent)})`;
 
     static propTypes = {
       accessToken: PropTypes.string,
@@ -121,10 +123,10 @@ export default function withApolloClient(WrappedComponent) {
     };
 
     static getDerivedStateFromProps(nextProps) {
-      const { pathname, query } = nextProps.router;
+      // const { pathname, query } = nextProps.router;
 
       // Update routing store with pathname and query after route change
-      rootMobxStores.routingStore.updateRoute({ pathname, query });
+      // rootMobxStores.routingStore.updateRoute({ pathname, query });
 
       return null;
     }
@@ -134,6 +136,7 @@ export default function withApolloClient(WrappedComponent) {
       // `getDataFromTree` renders the component first, then the client is passed off as a property.
       // After that, rendering is done using Next's normal rendering pipeline
       // this.apollo = initApollo(props.apolloState.data, { accessToken: props.accessToken });
+      console.log("HEY withApolloSearchClient()"); // fixme
       this.apollo = initApollo({});
 
       // State must be initialized if getDerivedStateFromProps is used
@@ -142,15 +145,15 @@ export default function withApolloClient(WrappedComponent) {
 
     render() {
       return (
-        <ApolloProvider searchClient={this.apollo}>
+        <ApolloProvider client={this.apollo}>
           <WrappedComponent {...this.props} />
         </ApolloProvider>
       );
     }
   }
 
-  // Exclude copying `getInitialProps` because WithApolloClient has its own
-  hoistNonReactStatic(WithApolloClient, WrappedComponent, { getInitialProps: true });
+  // Exclude copying `getInitialProps` because WithApolloSearchClient has its own
+  hoistNonReactStatic(WithApolloSearchClient, WrappedComponent, { getInitialProps: true });
 
-  return WithApolloClient;
+  return WithApolloSearchClient;
 }

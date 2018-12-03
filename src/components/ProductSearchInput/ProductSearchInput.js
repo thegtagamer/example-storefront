@@ -3,9 +3,9 @@ import PropTypes from "prop-types";
 import Field from "@reactioncommerce/components/Field/v1";
 import TextInput from "@reactioncommerce/components/TextInput/v1";
 import { productsBySearch } from "./queries.gql";
-import withApolloSearchClient from "lib/apollo/withApolloClient";
+import withApolloSearchClient from "lib/apollo-search/withApolloSearchClient";
 
-// @withApolloSearchClient
+@withApolloSearchClient
 export default class ProductSearchInput extends Component {
   static propTypes = {
     query: PropTypes.string,

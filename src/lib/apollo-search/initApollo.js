@@ -67,14 +67,16 @@ const create = (initialState, options) => {
   // }));
 
   const httpLink = new HttpLink({ uri: `${searchGraphqlUrl}`, credentials: "same-origin" });
-
-  return new ApolloClient({
+  console.log("HEY create() returning an apollo client", searchGraphqlUrl); // fixme
+  const ac = new ApolloClient({
     connectToDevTools: process.browser,
     ssrMode: !process.browser,
     // link: ApolloLink.from([omitTypenameLink, authLink, errorLink, httpLink]),
     link: ApolloLink.from([omitTypenameLink, errorLink, httpLink]),
     cache: new InMemoryCache().restore(initialState || {})
   });
+  console.log("HEY ApolloClient", ac); // fixme
+  return ac;
 };
 
 /**
@@ -84,6 +86,7 @@ const create = (initialState, options) => {
  * @return {ApolloClient} Apollo client instance
  */
 export default function initApollo(initialState, options) {
+  console.log("HEY initApollo()"); // fixme
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections (which would be bad)
   if (!process.browser) {
