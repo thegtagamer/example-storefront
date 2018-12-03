@@ -7,6 +7,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { withStyles } from "@material-ui/core/styles";
 import { NavigationDesktop } from "components/NavigationDesktop";
+import { ProductSearchInput } from "components/ProductSearchInput";
 import { NavigationMobile, NavigationToggleMobile } from "components/NavigationMobile";
 import AccountDropdown from "components/AccountDropdown";
 import ShopLogo from "@reactioncommerce/components/ShopLogo/v1";
@@ -78,6 +79,8 @@ class Header extends Component {
             <Hidden smDown initialWidth={"md"}>
               <NavigationDesktop />
             </Hidden>
+
+            <ProductSearchInput />
           </div>
 
           <AccountDropdown />

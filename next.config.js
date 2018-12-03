@@ -9,6 +9,7 @@ const initExport = {
     dev: process.env.NODE_ENV !== "production",
     appPath: process.env.NODE_ENV === "production" ? "./build/app" : "./src",
     graphqlUrl: process.env.INTERNAL_GRAPHQL_URL,
+    searchGraphqlUrl: process.env.INTERNAL_SEARCH_GRAPHQL_URL,
     faviconUrl: process.env.FAVICON_URL
   },
   /**
@@ -28,6 +29,7 @@ const initExport = {
   publicRuntimeConfig: {
     canonicalUrl: process.env.CANONICAL_URL,
     graphqlUrl: process.env.EXTERNAL_GRAPHQL_URL,
+    searchGraphqlUrl: process.env.EXTERNAL_SEARCH_GRAPHQL_URL,
     segmentAnalytics: {
       skipMinimize: process.env.SEGMENT_ANALYTICS_SKIP_MINIMIZE === "true", // Convert to a Boolean
       writeKey: process.env.SEGMENT_ANALYTICS_WRITE_KEY
