@@ -4,19 +4,25 @@ import Field from "@reactioncommerce/components/Field/v1";
 import TextInput from "@reactioncommerce/components/TextInput/v1";
 import { catalogBySearch } from "./queries.gql";
 import withApolloSearchClient from "lib/apollo-search/withApolloSearchClient";
-import { Query } from "react-apollo";
+import { ApolloConsumer, Query } from "react-apollo";
 
 @withApolloSearchClient
 export default class ProductSearchInput extends Component {
   static propTypes = {
     query: PropTypes.string,
     primaryShopId: PropTypes.string.isRequired,
-    routingStore: PropTypes.shape({
-      query: PropTypes.shape({
-        orderId: PropTypes.string.isRequired,
-        token: PropTypes.string
-      })
-    })
+    searchClient: PropTypes.object
+  };
+
+  onChangeQuery = async (client, query) => {
+    if (!query) {
+      return;
+    }
+    const { data } = await client.query({
+      query: catalogBySearch,
+      variables: { query }
+    });
+    console.log("Search query response", data);
   };
 
   render() {
@@ -28,26 +34,31 @@ export default class ProductSearchInput extends Component {
     };
 
     return (
-      <div>
-        <Query
-          query={catalogBySearch}
-          variables={variables}
-          client={this.props.searchClient}
-        >
-          {({ loading: isLoading, data: results }) => {
-            return (
-              <Field
-                name="product-search"
-                label="Search"
-                helpText="What are you looking for?"
-                labelFor="query"
-              >
-                <TextInput id="query" name="query" placeholder="" />
-              </Field>
-            );
-          }}
-        </Query>
-      </div>
+      <ApolloConsumer>
+        {client => (
+          <Field
+            name="product-search"
+            label="Search"
+            helpText="What are you looking for?"
+            labelFor="query"
+          >
+            <TextInput
+              id="query"
+              name="query"
+              placeholder=""
+              onChange={this.onChangeQuery.bind(null, client)}
+            />
+          </Field>
+        )}
+      </ApolloConsumer>
     );
   }
 }
+/*
+<Query
+  query={catalogBySearch}
+  variables={variables}
+  client={this.props.searchClient}
+>
+</Query>
+*/

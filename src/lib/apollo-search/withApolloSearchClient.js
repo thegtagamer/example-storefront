@@ -46,7 +46,6 @@ export default function withApolloSearchClient(WrappedComponent) {
 
       // const apollo = initApollo({ cookies: req && req.cookies }, { accessToken: user && user.accessToken });
       const apollo = initApollo();
-      console.log("HEY getInitialProps apollo", apollo); // fixme
 
       ctx.ctx.apolloSearchClient = apollo;
 
@@ -62,10 +61,8 @@ export default function withApolloSearchClient(WrappedComponent) {
       // }
 
       const apolloState = {};
-      console.log("HEY checking !process.browser"); // fixme
 
       if (!process.browser) {
-        console.log("HEY executing !process.browser block"); // fixme
         // Run all graphql queries in the component tree
         // and extract the resulting data
         try {
@@ -76,7 +73,6 @@ export default function withApolloSearchClient(WrappedComponent) {
               <WrappedComponent {...wrappedComponentProps} Component={Component} router={router} />
             </ApolloProvider>
           ); // eslint-disable-line
-          console.log("HEY apollo getDataFromTree result", result);
         } catch (error) {
           // Prevent Apollo Client GraphQL errors from crashing SSR.
           // Handle them in components via the data.error prop:
@@ -136,7 +132,6 @@ export default function withApolloSearchClient(WrappedComponent) {
       // `getDataFromTree` renders the component first, then the client is passed off as a property.
       // After that, rendering is done using Next's normal rendering pipeline
       // this.apollo = initApollo(props.apolloState.data, { accessToken: props.accessToken });
-      console.log("HEY withApolloSearchClient()"); // fixme
       this.apollo = initApollo({});
 
       // State must be initialized if getDerivedStateFromProps is used
