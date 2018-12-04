@@ -1,6 +1,7 @@
 import NextApp, { Container } from "next/app";
 import React from "react";
 import { ThemeProvider as RuiThemeProvider } from "styled-components";
+import { ReactiveBase } from "@appbaseio/reactivesearch";
 import { StripeProvider } from "react-stripe-elements";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -78,18 +79,23 @@ export default class App extends NextApp {
             generateClassName={this.pageContext.generateClassName}
           >
             <RuiThemeProvider theme={componentTheme}>
-              <MuiThemeProvider theme={this.pageContext.theme} sheetsManager={this.pageContext.sheetsManager}>
-                <CssBaseline />
-                {route === "/checkout" || route === "/login" ? (
-                  <StripeProvider stripe={stripe}>
-                    <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
-                  </StripeProvider>
-                ) : (
-                  <Layout shop={shop} viewer={viewer}>
-                    <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
-                  </Layout>
-                )}
-              </MuiThemeProvider>
+              <ReactiveBase
+                app="reaction.cdc.reaction.catalog.json-gen1"
+                url="http://localhost:9201"
+              >
+                <MuiThemeProvider theme={this.pageContext.theme} sheetsManager={this.pageContext.sheetsManager}>
+                  <CssBaseline />
+                  {route === "/checkout" || route === "/login" ? (
+                    <StripeProvider stripe={stripe}>
+                      <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
+                    </StripeProvider>
+                  ) : (
+                    <Layout shop={shop} viewer={viewer}>
+                      <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
+                    </Layout>
+                  )}
+                </MuiThemeProvider>
+              </ReactiveBase>
             </RuiThemeProvider>
           </JssProvider>
         </ComponentsProvider>

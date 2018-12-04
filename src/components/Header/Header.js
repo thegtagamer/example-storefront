@@ -5,6 +5,7 @@ import AppBar from "@material-ui/core/AppBar";
 import Hidden from "@material-ui/core/Hidden";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
+import { DataSearch } from "@appbaseio/reactivesearch";
 import { withStyles } from "@material-ui/core/styles";
 import { NavigationDesktop } from "components/NavigationDesktop";
 import { NavigationMobile, NavigationToggleMobile } from "components/NavigationMobile";
@@ -23,6 +24,9 @@ const styles = (theme) => ({
     alignItems: "inherit",
     display: "inherit",
     flex: 1
+  },
+  search: {
+    maxWidth: "400px"
   },
   title: {
     color: theme.palette.reaction.reactionBlue,
@@ -59,17 +63,17 @@ class Header extends Component {
   };
 
   render() {
-    const { classes: { appBar, controls, toolbar, title }, shop } = this.props;
+    const { classes, shop } = this.props;
 
     return (
-      <AppBar position="static" elevation={0} className={appBar}>
-        <Toolbar className={toolbar}>
+      <AppBar position="static" elevation={0} className={classes.appBar}>
+        <Toolbar className={classes.toolbar}>
           <Hidden mdUp>
             <NavigationToggleMobile onClick={this.handleNavigationToggleClick} />
           </Hidden>
 
-          <div className={controls}>
-            <Typography className={title} color="inherit" variant="title">
+          <div className={classes.controls}>
+            <Typography className={classes.title} color="inherit" variant="title">
               <Link route="/">
                 <ShopLogo shopName={shop.name} />
               </Link>
@@ -79,7 +83,9 @@ class Header extends Component {
               <NavigationDesktop />
             </Hidden>
           </div>
-
+          <div className={classes.search}>
+            <DataSearch componentId="catalogSearchBox" dataField={["product.title"]} />
+          </div>
           <AccountDropdown />
           <MiniCart />
         </Toolbar>
