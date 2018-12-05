@@ -1,8 +1,14 @@
-#import "./fragments.gql"
-
-# Get an order
-query catalogBySearch($shopId: ID!, $token: String, $query: String) {
-  results: catalogBySearch(shopId: $shopId, token: $token, query: $query) {
-    ...CatalogCommon
+query productSearch($query: String!) {
+  productSearch(query: {match: {product__title: {query: $query}}}) {
+    hits {
+      _source {
+        id
+        shopId
+        product {
+          title
+          description
+        }
+      }
+    }
   }
 }

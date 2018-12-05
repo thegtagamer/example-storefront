@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Field from "@reactioncommerce/components/Field/v1";
 import TextInput from "@reactioncommerce/components/TextInput/v1";
-import { catalogBySearch } from "./queries.gql";
+import { productSearch } from "./queries.gql";
 import withApolloSearchClient from "lib/apollo-search/withApolloSearchClient";
 import { ApolloConsumer, Query } from "react-apollo";
 
@@ -10,7 +10,6 @@ import { ApolloConsumer, Query } from "react-apollo";
 export default class ProductSearchInput extends Component {
   static propTypes = {
     query: PropTypes.string,
-    primaryShopId: PropTypes.string.isRequired,
     searchClient: PropTypes.object
   };
 
@@ -19,7 +18,7 @@ export default class ProductSearchInput extends Component {
       return;
     }
     const { data } = await client.query({
-      query: catalogBySearch,
+      query: productSearch,
       variables: { query }
     });
     console.log("Search query response", data);
