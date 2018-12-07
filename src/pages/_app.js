@@ -1,11 +1,13 @@
 import NextApp, { Container } from "next/app";
 import React from "react";
+import { ReactiveBase } from "@appbaseio/reactivesearch";
 import { ThemeProvider as RuiThemeProvider } from "styled-components";
 import { StripeProvider } from "react-stripe-elements";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import JssProvider from "react-jss/lib/JssProvider";
 import { ComponentsProvider } from "@reactioncommerce/components-context";
+import get from "lodash.get";
 import getConfig from "next/config";
 import track from "lib/tracking/track";
 import dispatch from "lib/tracking/dispatch";
@@ -65,35 +67,64 @@ export default class App extends NextApp {
     }
   }
 
+  transformSearchRequest = (request) => {
+    // console.log("request", JSON.stringify(request));
+    const [preference, elasticQuery] = request.body.split("\n");
+    // console.log("elasticQuery", JSON.parse(elasticQuery));
+
+    // const graphqlQuery = get(JSON.parse(elasticQuery), "query");
+    let graphqlQuery = get(JSON.parse(elasticQuery), "query.bool.must[0].bool.must.graphqlQuery");
+    if (!graphqlQuery) {
+      console.log("graphqlQuery", graphqlQuery);
+
+
+      graphqlQuery = get(JSON.parse(elasticQuery), "query.bool.must[0].bool.must[0].graphqlQuery");
+    }
+
+    const q = `
+      {
+        from: ${elasticQuery.from || 0},
+        query: ${graphqlQuery},
+        size: ${elasticQuery.size || 10},
+        _source: ${elasticQuery._source || { excludes: [], includes: ["*"] }}
+      }
+      `;
+
+    request.body = JSON.parse({
+      ...preference,
+      ...q
+    });
+    // console.log("graphQLRequest", request.body);
+
+    return request;
+  }
+
   render() {
     const { Component, pageProps, shop, viewer, ...rest } = this.props;
     const { route } = this.props.router;
     const { stripe } = this.state;
 
-    return (
-      <Container>
-        <ComponentsProvider value={components}>
-          <JssProvider
-            registry={this.pageContext.sheetsRegistry}
-            generateClassName={this.pageContext.generateClassName}
+    return <Container>
+      <ComponentsProvider value={components}>
+        <JssProvider registry={this.pageContext.sheetsRegistry} generateClassName={this.pageContext.generateClassName}>
+          <ReactiveBase
+            app="reaction.cdc.reaction.catalog.json-gen1"
+            url="http://graphql-proxy.search-api.reaction.localhost:9201"
+            transformRequest={this.transformSearchRequest}
           >
             <RuiThemeProvider theme={componentTheme}>
               <MuiThemeProvider theme={this.pageContext.theme} sheetsManager={this.pageContext.sheetsManager}>
                 <CssBaseline />
-                {route === "/checkout" || route === "/login" ? (
-                  <StripeProvider stripe={stripe}>
-                    <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
-                  </StripeProvider>
-                ) : (
-                  <Layout shop={shop} viewer={viewer}>
-                    <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
-                  </Layout>
-                )}
+                {route === "/checkout" || route === "/login" ? <StripeProvider stripe={stripe}>
+                  <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
+                </StripeProvider> : <Layout shop={shop} viewer={viewer}>
+                  <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
+                </Layout>}
               </MuiThemeProvider>
             </RuiThemeProvider>
-          </JssProvider>
-        </ComponentsProvider>
-      </Container>
-    );
+          </ReactiveBase>
+        </JssProvider>
+      </ComponentsProvider>
+    </Container>;
   }
 }

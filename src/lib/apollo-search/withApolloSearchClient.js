@@ -114,7 +114,7 @@ export default function withApolloSearchClient(WrappedComponent) {
 
     static propTypes = {
       accessToken: PropTypes.string,
-      apolloState: PropTypes.object.isRequired,
+      apolloState: PropTypes.object,
       router: PropTypes.object
     };
 

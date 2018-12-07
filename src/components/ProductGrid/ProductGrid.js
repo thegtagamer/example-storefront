@@ -1,20 +1,22 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 import Grid from "@material-ui/core/Grid";
+import { ResultCard } from "@appbaseio/reactivesearch";
 import { withStyles } from "@material-ui/core/styles";
-import CatalogGrid from "@reactioncommerce/components/CatalogGrid/v1";
 import track from "lib/tracking/track";
 import trackProductClicked from "lib/tracking/trackProductClicked";
-import PageLoading from "components/PageLoading";
-import PageStepper from "components/PageStepper";
 import PageSizeSelector from "components/PageSizeSelector";
 import SortBySelector from "components/SortBySelector";
-import ProductGridEmptyMessage from "./ProductGridEmptyMessage";
 
 const styles = (theme) => ({
   filters: {
     justifyContent: "flex-end",
     marginBottom: theme.spacing.unit * 2
+  },
+  resultCard: {
+    "& .resultImage": {
+      boxShadow: "none"
+    }
   }
 });
 
@@ -57,37 +59,35 @@ export default class ProductGrid extends Component {
   }
 
   @trackProductClicked()
-  onItemClick = (event, product) => {} // eslint-disable-line no-unused-vars
-
-  renderMainArea() {
-    const { catalogItems, initialSize, isLoadingCatalogItems, pageInfo } = this.props;
-
-    if (isLoadingCatalogItems) return <PageLoading />;
-
-    const products = (catalogItems || []).map((item) => item.node.product);
-    if (products.length === 0) return <ProductGridEmptyMessage />;
-
-    return (
-      <Fragment>
-        <Grid container spacing={24}>
-          <CatalogGrid
-            initialSize={initialSize}
-            onItemClick={this.onItemClick}
-            products={products}
-            placeholderImageURL="/static/images/placeholder.gif"
-            {...this.props}
-          />
-        </Grid>
-        {pageInfo && <PageStepper pageInfo={pageInfo} />}
-      </Fragment>
-    );
-  }
+  onItemClick = (event, product) => { } // eslint-disable-line no-unused-vars
 
   render() {
+    const { classes } = this.props;
+
     return (
       <Fragment>
-        {this.renderFilters()}
-        {this.renderMainArea()}
+        <ResultCard
+          className={classes.resultCard}
+          componentId="catalogSearchResults"
+          dataField="product.title"
+          innerClass={{
+            listItem: "resultImage"
+          }}
+          onData={(res) => {
+            console.log("response", res);
+
+            return ({
+              description: res.product.vendor,
+              image: `http://localhost:3000/${res.product.media[0].URLs.small}`,
+              title: <div>{res.product.title}{res.product.pricing.USD.displayPrice}</div>,
+              url: `/product/${res.product.slug}`
+            });
+          }}
+          react={{
+            and: ["catalogSearchInput"]
+          }}
+          target="_self"
+        />
       </Fragment>
     );
   }

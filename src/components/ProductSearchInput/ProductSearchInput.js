@@ -2,9 +2,10 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Field from "@reactioncommerce/components/Field/v1";
 import TextInput from "@reactioncommerce/components/TextInput/v1";
-import { productSearch } from "./queries.gql";
 import withApolloSearchClient from "lib/apollo-search/withApolloSearchClient";
-import { ApolloConsumer, Query } from "react-apollo";
+import { ApolloConsumer } from "react-apollo";
+import { DataSearch } from "@appbaseio/reactivesearch";
+import { productSearch } from "./queries.gql";
 
 @withApolloSearchClient
 export default class ProductSearchInput extends Component {
@@ -17,12 +18,64 @@ export default class ProductSearchInput extends Component {
     if (!query) {
       return;
     }
+
+    console.log("query", query);
+
     const { data } = await client.query({
       query: productSearch,
       variables: { query }
     });
     console.log("Search query response", data);
   };
+
+  renderCustomSearch = () => (
+    <ApolloConsumer>
+      {(client) => (
+        <Field name="product-search" label="Search" helpText="What are you looking for?" labelFor="query">
+          <TextInput id="query" name="query" placeholder="" onChange={this.onChangeQuery.bind(null, client)} />
+        </Field>
+      )}
+    </ApolloConsumer>
+  );
+
+  renderReactiveSearch = () => (
+    <DataSearch
+      componentId="catalogSearchInput"
+      dataField={["product.title"]}
+      defaultSelected="new"
+      style={{ maxWidth: "200px" }}
+      customQuery={function (value, props) {
+        return {
+          graphqlQuery: `
+                {
+                  productSearch( query: { match: { product__title: { query: "${value}" } } }) {
+                    hits {
+                      _id
+                      _index
+                      _score
+                      _source {
+                        product {
+                          title
+                        }
+                      }
+                      _type
+                    }
+                    count
+                    max_score
+                    took
+                    timed_out
+                    _shards {
+                      failed
+                      successful
+                      total
+                    }
+                  }
+                }
+              `
+        };
+      }}
+    />
+  );
 
   render() {
     const { primaryShopId, query } = this.props;
@@ -32,32 +85,6 @@ export default class ProductSearchInput extends Component {
       primaryShopId
     };
 
-    return (
-      <ApolloConsumer>
-        {client => (
-          <Field
-            name="product-search"
-            label="Search"
-            helpText="What are you looking for?"
-            labelFor="query"
-          >
-            <TextInput
-              id="query"
-              name="query"
-              placeholder=""
-              onChange={this.onChangeQuery.bind(null, client)}
-            />
-          </Field>
-        )}
-      </ApolloConsumer>
-    );
+    return this.renderReactiveSearch();
   }
 }
-/*
-<Query
-  query={catalogBySearch}
-  variables={variables}
-  client={this.props.searchClient}
->
-</Query>
-*/
