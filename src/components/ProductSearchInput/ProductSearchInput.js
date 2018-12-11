@@ -40,9 +40,8 @@ export default class ProductSearchInput extends Component {
 
   renderReactiveSearch = () => (
     <DataSearch
-      componentId="catalogSearchInput"
+      componentId="productSearch"
       dataField={["product.title"]}
-      defaultSelected="new"
       style={{ maxWidth: "200px" }}
       customQuery={function (value, props) {
         return {

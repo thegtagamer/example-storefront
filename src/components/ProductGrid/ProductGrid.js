@@ -68,7 +68,7 @@ export default class ProductGrid extends Component {
       <Fragment>
         <ResultCard
           className={classes.resultCard}
-          componentId="catalogSearchResults"
+          componentId="catalogSearchResultsConnection"
           dataField="product.title"
           innerClass={{
             listItem: "resultImage"
@@ -84,7 +84,7 @@ export default class ProductGrid extends Component {
             });
           }}
           react={{
-            and: ["catalogSearchInput"]
+            and: ["catalogSearchQuery"]
           }}
           target="_self"
         />

@@ -23,6 +23,48 @@ import getPageContext from "../lib/theme/getPageContext";
 import componentTheme from "../lib/theme/componentTheme";
 
 const { publicRuntimeConfig } = getConfig();
+const matchAllDefaultQuery = `
+{
+  productSearchConnection(
+    query: { match_all:{} }, 
+    sort: _score, 
+    first: 1
+  ) 
+  {
+    _shards {
+      successful,
+      failed
+      total
+    }
+    count
+    max_score
+    took
+    timed_out
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    edges {
+      cursor
+      node {
+        _score
+        _source {
+          product {
+            description
+            media
+            pricing
+            slug
+            title
+            vendor
+          }
+        }
+      }
+    }
+  }
+}
+`;
 
 @withApolloClient
 @withMobX
@@ -68,33 +110,24 @@ export default class App extends NextApp {
   }
 
   transformSearchRequest = (request) => {
-    // console.log("request", JSON.stringify(request));
     const [preference, elasticQuery] = request.body.split("\n");
     // console.log("elasticQuery", JSON.parse(elasticQuery));
+    console.log("preference", preference);
 
-    // const graphqlQuery = get(JSON.parse(elasticQuery), "query");
+
+    // Get query from sensor component, i.e. SearchInput component
     let graphqlQuery = get(JSON.parse(elasticQuery), "query.bool.must[0].bool.must.graphqlQuery");
     if (!graphqlQuery) {
-      console.log("graphqlQuery", graphqlQuery);
-
-
+      // Get query from a results component, i.e. ResultCard
       graphqlQuery = get(JSON.parse(elasticQuery), "query.bool.must[0].bool.must[0].graphqlQuery");
+      // Get initial query, "match_all: {}"
+      if (!graphqlQuery) {
+        // TODO: add dynamic values for first, and cursor args
+        graphqlQuery = matchAllDefaultQuery;
+      }
     }
 
-    const q = `
-      {
-        from: ${elasticQuery.from || 0},
-        query: ${graphqlQuery},
-        size: ${elasticQuery.size || 10},
-        _source: ${elasticQuery._source || { excludes: [], includes: ["*"] }}
-      }
-      `;
-
-    request.body = JSON.parse({
-      ...preference,
-      ...q
-    });
-    // console.log("graphQLRequest", request.body);
+    request.body = JSON.stringify(graphqlQuery);
 
     return request;
   }
@@ -109,8 +142,8 @@ export default class App extends NextApp {
         <JssProvider registry={this.pageContext.sheetsRegistry} generateClassName={this.pageContext.generateClassName}>
           <ReactiveBase
             app="reaction.cdc.reaction.catalog.json-gen1"
-            url="http://graphql-proxy.search-api.reaction.localhost:9201"
             transformRequest={this.transformSearchRequest}
+            url="http://graphql-proxy.search-api.reaction.localhost:9201"
           >
             <RuiThemeProvider theme={componentTheme}>
               <MuiThemeProvider theme={this.pageContext.theme} sheetsManager={this.pageContext.sheetsManager}>
