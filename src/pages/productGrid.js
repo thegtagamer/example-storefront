@@ -2,12 +2,9 @@ import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 import { observer, inject } from "mobx-react";
 import Helmet from "react-helmet";
-import withCatalogItems from "containers/catalog/withCatalogItems";
 import ProductGrid from "components/ProductGrid";
 import trackProductListViewed from "lib/tracking/trackProductListViewed";
-import { inPageSizes } from "lib/utils/pageSizes";
 
-@withCatalogItems
 @inject("routingStore", "uiStore")
 @observer
 class ProductGridPage extends Component {
@@ -67,16 +64,8 @@ class ProductGridPage extends Component {
 
   render() {
     const {
-      catalogItems,
-      catalogItemsPageInfo,
-      initialGridSize,
-      isLoadingCatalogItems,
-      routingStore: { query },
-      shop,
-      uiStore
+      shop
     } = this.props;
-    const pageSize = query && inPageSizes(query.limit) ? parseInt(query.limit, 10) : uiStore.pageSize;
-    const sortBy = query && query.sortby ? query.sortby : uiStore.sortBy;
     const pageTitle = shop && shop.description ? `${shop.name} | ${shop.description}` : shop.name;
 
     return (
@@ -85,17 +74,7 @@ class ProductGridPage extends Component {
           title={pageTitle}
           meta={[{ name: "description", content: shop && shop.description }]}
         />
-        <ProductGrid
-          catalogItems={catalogItems}
-          currencyCode={shop.currency.code}
-          initialSize={initialGridSize}
-          isLoadingCatalogItems={isLoadingCatalogItems}
-          pageInfo={catalogItemsPageInfo}
-          pageSize={pageSize}
-          setPageSize={this.setPageSize}
-          setSortBy={this.setSortBy}
-          sortBy={sortBy}
-        />
+        <ProductGrid />
       </Fragment>
     );
   }
