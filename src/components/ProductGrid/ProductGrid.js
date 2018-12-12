@@ -68,23 +68,25 @@ export default class ProductGrid extends Component {
       <Fragment>
         <ResultCard
           className={classes.resultCard}
-          componentId="catalogSearchResultsConnection"
+          componentId="productSearchConnection"
           dataField="product.title"
+          key={"new"}
           innerClass={{
             listItem: "resultImage"
           }}
-          onData={(res) => {
-            console.log("response", res);
-
-            return ({
+          onData={(res) =>
+            // console.log("response", res);
+            ({
               description: res.product.vendor,
               image: `http://localhost:3000/${res.product.media[0].URLs.small}`,
               title: <div>{res.product.title}{res.product.pricing.USD.displayPrice}</div>,
               url: `/product/${res.product.slug}`
-            });
-          }}
+            })
+          }
+          pagination={true}
+          size={20}
           react={{
-            and: ["catalogSearchQuery"]
+            and: ["productSearch"]
           }}
           target="_self"
         />

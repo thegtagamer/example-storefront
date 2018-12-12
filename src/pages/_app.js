@@ -26,13 +26,13 @@ const { publicRuntimeConfig } = getConfig();
 const matchAllDefaultQuery = `
 {
   productSearchConnection(
-    query: { match_all:{} }, 
-    sort: _score, 
-    first: 1
+    query: { match_all:{} } 
+    sort: [_score, id__asc]
+    first: 20
   ) 
   {
     _shards {
-      successful,
+      successful
       failed
       total
     }
@@ -111,23 +111,26 @@ export default class App extends NextApp {
 
   transformSearchRequest = (request) => {
     const [preference, elasticQuery] = request.body.split("\n");
-    // console.log("elasticQuery", JSON.parse(elasticQuery));
-    console.log("preference", preference);
-
 
     // Get query from sensor component, i.e. SearchInput component
     let graphqlQuery = get(JSON.parse(elasticQuery), "query.bool.must[0].bool.must.graphqlQuery");
     if (!graphqlQuery) {
       // Get query from a results component, i.e. ResultCard
       graphqlQuery = get(JSON.parse(elasticQuery), "query.bool.must[0].bool.must[0].graphqlQuery");
-      // Get initial query, "match_all: {}"
+      // Otherwise, use default initial query, "match_all: {}"
       if (!graphqlQuery) {
         // TODO: add dynamic values for first, and cursor args
         graphqlQuery = matchAllDefaultQuery;
       }
     }
 
-    request.body = JSON.stringify(graphqlQuery);
+    const transformedBody = {
+      field: JSON.parse(preference).preference,
+      query: graphqlQuery.replace(/[\r\n]+/g, "")
+    };
+
+    request.body = JSON.stringify(transformedBody);
+    console.log("transformedBody", request.body);
 
     return request;
   }

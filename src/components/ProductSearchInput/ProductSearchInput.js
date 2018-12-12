@@ -14,65 +14,85 @@ export default class ProductSearchInput extends Component {
     searchClient: PropTypes.object
   };
 
-  onChangeQuery = async (client, query) => {
-    if (!query) {
-      return;
-    }
+  // onChangeQuery = async (client, query) => {
+  //   if (!query) {
+  //     return;
+  //   }
 
-    console.log("query", query);
+  //   console.log("query", query);
 
-    const { data } = await client.query({
-      query: productSearch,
-      variables: { query }
-    });
-    console.log("Search query response", data);
-  };
+  //   const { data } = await client.query({
+  //     query: productSearch,
+  //     variables: { query }
+  //   });
+  //   console.log("Search query response", data);
+  // };
 
-  renderCustomSearch = () => (
-    <ApolloConsumer>
-      {(client) => (
-        <Field name="product-search" label="Search" helpText="What are you looking for?" labelFor="query">
-          <TextInput id="query" name="query" placeholder="" onChange={this.onChangeQuery.bind(null, client)} />
-        </Field>
-      )}
-    </ApolloConsumer>
-  );
+  // renderCustomSearch = () => (
+  //   <ApolloConsumer>
+  //     {(client) => (
+  //       <Field name="product-search" label="Search" helpText="What are you looking for?" labelFor="query">
+  //         <TextInput id="query" name="query" placeholder="" onChange={this.onChangeQuery.bind(null, client)} />
+  //       </Field>
+  //     )}
+  //   </ApolloConsumer>
+  // );
 
   renderReactiveSearch = () => (
     <DataSearch
-      componentId="productSearch"
+      componentId="productSearchConnection"
       dataField={["product.title"]}
       style={{ maxWidth: "200px" }}
       customQuery={function (value, props) {
+        console.log("searchInputProps", props);
+
+        // TODO: rewrite query as a boolean query
         return {
           graphqlQuery: `
-                {
-                  productSearch( query: { match: { product__title: { query: "${value}" } } }) {
-                    hits {
-                      _id
-                      _index
+            {
+              productSearchConnection(
+                query: { match: { product__title: { query: "${value}" } } }
+                sort: [_score, id__asc]
+                first: 10 
+                ) {
+                  _shards {
+                    successful,
+                    failed
+                    total
+                  }
+                  count
+                  max_score
+                  took
+                  timed_out
+                  pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                  }
+                  edges {
+                    cursor
+                    node {
                       _score
                       _source {
                         product {
+                          description
+                          media
+                          pricing
+                          slug
                           title
+                          vendor
                         }
                       }
-                      _type
-                    }
-                    count
-                    max_score
-                    took
-                    timed_out
-                    _shards {
-                      failed
-                      successful
-                      total
                     }
                   }
-                }
-              `
+
+              }
+            }
+          `
         };
       }}
+      urlParams={true}
     />
   );
 
