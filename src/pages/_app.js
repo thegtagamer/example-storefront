@@ -18,53 +18,12 @@ import withTags from "containers/tags/withTags";
 import Layout from "components/Layout";
 import withMobX from "lib/stores/withMobX";
 import rootMobXStores from "lib/stores";
+import defaultCatalogQuery from "components/ProductGrid/defaultQuery";
 import components from "../lib/theme/components";
 import getPageContext from "../lib/theme/getPageContext";
 import componentTheme from "../lib/theme/componentTheme";
 
 const { publicRuntimeConfig } = getConfig();
-const matchAllDefaultQuery = `
-{
-  productSearchConnection(
-    query: { match_all:{} } 
-    sort: [_score, id__asc]
-    first: 20
-  ) 
-  {
-    _shards {
-      successful
-      failed
-      total
-    }
-    count
-    max_score
-    took
-    timed_out
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-    }
-    edges {
-      cursor
-      node {
-        _score
-        _source {
-          product {
-            description
-            media
-            pricing
-            slug
-            title
-            vendor
-          }
-        }
-      }
-    }
-  }
-}
-`;
 
 @withApolloClient
 @withMobX
@@ -110,57 +69,70 @@ export default class App extends NextApp {
   }
 
   transformSearchRequest = (request) => {
-    const [preference, elasticQuery] = request.body.split("\n");
+    const [preference, esQuery] = request.body.split("\n");
+    const elasticQuery = JSON.parse(esQuery);
+    const { size, from: startFrom } = elasticQuery;
+    // If "from" is not defined, default to 0
+    const page = (startFrom || 0 / size) + 1;
+
+    // console.log("elasticClientQuery", elasticQuery);
 
     // Get query from sensor component, i.e. SearchInput component
-    let graphqlQuery = get(JSON.parse(elasticQuery), "query.bool.must[0].bool.must.graphqlQuery");
+    let graphqlQuery = get(elasticQuery, "query.bool.must[0].bool.must.graphqlQuery");
     if (!graphqlQuery) {
       // Get query from a results component, i.e. ResultCard
-      graphqlQuery = get(JSON.parse(elasticQuery), "query.bool.must[0].bool.must[0].graphqlQuery");
+      graphqlQuery = get(elasticQuery, "query.bool.must[0].bool.must[0].graphqlQuery");
       // Otherwise, use default initial query, "match_all: {}"
       if (!graphqlQuery) {
-        // TODO: add dynamic values for first, and cursor args
-        graphqlQuery = matchAllDefaultQuery;
+        graphqlQuery = defaultCatalogQuery;
       }
     }
-
     const transformedBody = {
       field: JSON.parse(preference).preference,
-      query: graphqlQuery.replace(/[\r\n]+/g, "")
+      query: graphqlQuery.replace(/PAGE/, page).replace(/PER_PAGE/, size)
     };
 
     request.body = JSON.stringify(transformedBody);
     console.log("transformedBody", request.body);
 
     return request;
-  }
+  };
 
   render() {
     const { Component, pageProps, shop, viewer, ...rest } = this.props;
     const { route } = this.props.router;
     const { stripe } = this.state;
 
-    return <Container>
-      <ComponentsProvider value={components}>
-        <JssProvider registry={this.pageContext.sheetsRegistry} generateClassName={this.pageContext.generateClassName}>
-          <ReactiveBase
-            app="reaction.cdc.reaction.catalog.json-gen1"
-            transformRequest={this.transformSearchRequest}
-            url="http://graphql-proxy.search-api.reaction.localhost:9201"
+    return (
+      <Container>
+        <ComponentsProvider value={components}>
+          <JssProvider
+            registry={this.pageContext.sheetsRegistry}
+            generateClassName={this.pageContext.generateClassName}
           >
-            <RuiThemeProvider theme={componentTheme}>
-              <MuiThemeProvider theme={this.pageContext.theme} sheetsManager={this.pageContext.sheetsManager}>
-                <CssBaseline />
-                {route === "/checkout" || route === "/login" ? <StripeProvider stripe={stripe}>
-                  <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
-                </StripeProvider> : <Layout shop={shop} viewer={viewer}>
-                  <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
-                </Layout>}
-              </MuiThemeProvider>
-            </RuiThemeProvider>
-          </ReactiveBase>
-        </JssProvider>
-      </ComponentsProvider>
-    </Container>;
+            <ReactiveBase
+              app="reaction.cdc.reaction.catalog.json-gen1"
+              transformRequest={this.transformSearchRequest}
+              url="http://graphql-proxy.search-api.reaction.localhost:9201"
+            >
+              <RuiThemeProvider theme={componentTheme}>
+                <MuiThemeProvider theme={this.pageContext.theme} sheetsManager={this.pageContext.sheetsManager}>
+                  <CssBaseline />
+                  {route === "/checkout" || route === "/login" ? (
+                    <StripeProvider stripe={stripe}>
+                      <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
+                    </StripeProvider>
+                  ) : (
+                    <Layout shop={shop} viewer={viewer}>
+                      <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
+                    </Layout>
+                  )}
+                </MuiThemeProvider>
+              </RuiThemeProvider>
+            </ReactiveBase>
+          </JssProvider>
+        </ComponentsProvider>
+      </Container>
+    );
   }
 }

@@ -26,7 +26,7 @@ export default class ProductGrid extends Component {
   static propTypes = {
     catalogItems: PropTypes.arrayOf(PropTypes.object),
     classes: PropTypes.object,
-    currencyCode: PropTypes.string.isRequired,
+    // currencyCode: PropTypes.string.isRequired,
     initialSize: PropTypes.object,
     isLoadingCatalogItems: PropTypes.bool,
     pageInfo: PropTypes.shape({
@@ -36,11 +36,11 @@ export default class ProductGrid extends Component {
       hasPreviousPage: PropTypes.bool,
       loadNextPage: PropTypes.func,
       loadPreviousPage: PropTypes.func
-    }),
-    pageSize: PropTypes.number.isRequired,
-    setPageSize: PropTypes.func.isRequired,
-    setSortBy: PropTypes.func.isRequired,
-    sortBy: PropTypes.string.isRequired
+    })
+    // pageSize: PropTypes.number.isRequired,
+    // setPageSize: PropTypes.func.isRequired,
+    // setSortBy: PropTypes.func.isRequired,
+    // sortBy: PropTypes.string.isRequired
   };
 
   renderFilters() {
@@ -68,9 +68,8 @@ export default class ProductGrid extends Component {
       <Fragment>
         <ResultCard
           className={classes.resultCard}
-          componentId="productSearchConnection"
-          dataField="product.title"
-          key={"new"}
+          componentId="productSearchPagination"
+          dataField={["product.title"]}
           innerClass={{
             listItem: "resultImage"
           }}
@@ -82,11 +81,14 @@ export default class ProductGrid extends Component {
               title: <div>{res.product.title}{res.product.pricing.USD.displayPrice}</div>,
               url: `/product/${res.product.slug}`
             })
+
           }
           pagination={true}
+          pages={3}
+          URLParams={false}
           size={20}
           react={{
-            and: ["productSearch"]
+            and: ["productSearchPagination"]
           }}
           target="_self"
         />
