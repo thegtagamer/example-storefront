@@ -73,8 +73,7 @@ export default class App extends NextApp {
     const elasticQuery = JSON.parse(esQuery);
     const { size, from: startFrom } = elasticQuery;
     // If "from" is not defined, default to 0
-    const page = (startFrom || 0 / size) + 1;
-
+    const page = ((startFrom / size) || 0) + 1;
     // console.log("elasticClientQuery", elasticQuery);
 
     // Get query from sensor component, i.e. SearchInput component
