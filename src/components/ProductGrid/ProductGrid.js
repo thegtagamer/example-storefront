@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Grid from "@material-ui/core/Grid";
 import { ResultCard } from "@appbaseio/reactivesearch";
@@ -65,34 +65,32 @@ export default class ProductGrid extends Component {
     const { classes } = this.props;
 
     return (
-      <Fragment>
-        <ResultCard
-          className={classes.resultCard}
-          componentId="productSearchPagination"
-          dataField={["product.title"]}
-          innerClass={{
-            listItem: "resultImage"
-          }}
-          onData={(res) =>
-            // console.log("response", res);
-            ({
-              description: res.product.vendor,
-              image: `http://localhost:3000/${res.product.media[0].URLs.small}`,
-              title: <div>{res.product.title}{res.product.pricing.USD.displayPrice}</div>,
-              url: `/product/${res.product.slug}`
-            })
+      <ResultCard
+        className={classes.resultCard}
+        componentId="productSearchPagination"
+        dataField={["product.title"]}
+        innerClass={{
+          listItem: "resultImage"
+        }}
+        onData={(res) =>
+        // console.log("response", res);
+          ({
+            description: res.product.vendor,
+            image: `http://localhost:3000/${res.product.media[0].URLs.small}`,
+            title: <div>{res.product.title}{res.product.pricing.USD.displayPrice}</div>,
+            url: `/product/${res.product.slug}`
+          })
 
-          }
-          pagination={true}
-          pages={3}
-          URLParams={false}
-          size={20}
-          react={{
-            and: ["productSearchPagination"]
-          }}
-          target="_self"
-        />
-      </Fragment>
+        }
+        pagination={true}
+        pages={3}
+        URLParams={false}
+        size={20}
+        react={{
+          and: ["productSearchPagination"]
+        }}
+        target="_self"
+      />
     );
   }
 }
