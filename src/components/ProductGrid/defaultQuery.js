@@ -18,6 +18,14 @@ export default `
           slug
           title
           vendor
+          variants {
+            _id
+            title
+            options {
+              _id
+              optionTitle
+            }
+          }
         }
       }
     }

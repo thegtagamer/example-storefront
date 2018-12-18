@@ -61,6 +61,14 @@ export function productSearchPagination(searchString) {
                 slug
                 title
                 vendor
+                variants {
+                  _id
+                  title
+                  options {
+                    _id
+                    title
+                  }
+                }
               }
             }
           }
