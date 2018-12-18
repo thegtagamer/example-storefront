@@ -10,6 +10,19 @@ const styles = ({
   }
 });
 
+export const productSearchInputProps = {
+  dataField: ["product.title"],
+  componentId: "productSearchInput",
+  style: { maxWidth: "200px" },
+  defaultSelected: "",
+  customQuery(value, props) {
+  // console.log("props", props);
+    return {
+      graphqlQuery: productSearchPagination(value)
+    };
+  }
+};
+
 @withStyles(styles)
 export default class ProductSearchInput extends Component {
   static propTypes = {
@@ -21,15 +34,7 @@ export default class ProductSearchInput extends Component {
     return (
       <div className={classes.container}>
         <DataSearch
-          componentId="productSearchPagination"
-          dataField={["product.title"]}
-          style={{ maxWidth: "200px" }}
-          customQuery={function (value, props) {
-          // console.log("props", props);
-            return {
-              graphqlQuery: productSearchPagination(value)
-            };
-          }}
+          {...productSearchInputProps}
         />
       </div>
     );

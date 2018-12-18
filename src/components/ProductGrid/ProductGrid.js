@@ -8,6 +8,29 @@ import trackProductClicked from "lib/tracking/trackProductClicked";
 import PageSizeSelector from "components/PageSizeSelector";
 import SortBySelector from "components/SortBySelector";
 
+
+export const searchResultCardProps = {
+  componentId: "searchResultCardProps",
+  dataField: "product.title",
+  // from: 0,
+  size: 4,
+  onData: (res) =>
+    // console.log("response", res);
+    ({
+      description: res.product.vendor,
+      image: `http://localhost:3000/${res.product.media[0].URLs.small}`,
+      title: <div>{res.product.title}{res.product.pricing.USD.displayPrice}</div>,
+      url: `/product/${res.product.slug}`
+    }),
+  pagination: true,
+  pages: 3,
+  URLParams: false,
+  react: {
+    and: ["productSearchInput"]
+  },
+  target: "_self"
+};
+
 const styles = (theme) => ({
   filters: {
     justifyContent: "flex-end",
@@ -66,30 +89,11 @@ export default class ProductGrid extends Component {
 
     return (
       <ResultCard
-        className={classes.resultCard}
-        componentId="productSearchPagination"
-        dataField={["product.title"]}
-        innerClass={{
-          listItem: "resultImage"
-        }}
-        onData={(res) =>
-        // console.log("response", res);
-          ({
-            description: res.product.vendor,
-            image: `http://localhost:3000/${res.product.media[0].URLs.small}`,
-            title: <div>{res.product.title}{res.product.pricing.USD.displayPrice}</div>,
-            url: `/product/${res.product.slug}`
-          })
-
+        {
+        ...searchResultCardProps
         }
-        pagination={true}
-        pages={3}
-        URLParams={false}
-        size={20}
-        react={{
-          and: ["productSearchPagination"]
-        }}
-        target="_self"
+        className={classes.resultCard}
+        innerClass={{ listItem: "resultImage" }}
       />
     );
   }
