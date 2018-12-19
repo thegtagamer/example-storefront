@@ -54,10 +54,9 @@ function transformSearchRequest(request) {
     query: graphqlQuery.replace(/PAGE/, page).replace(/PER_PAGE/, size)
   };
 
-  // console.log("********************transformedBody", transformedBody);
-  // return transformedBody;
+  // console.log("transformedBody", transformedBody);
+  // Executing in Node
   if (typeof window === "undefined") {
-    // Executing in Node
     return transformedBody;
   }
 
