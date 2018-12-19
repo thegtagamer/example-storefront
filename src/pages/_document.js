@@ -5,6 +5,7 @@ import flush from "styled-jsx/server";
 import Helmet from "react-helmet";
 import analyticsProviders from "analytics";
 import { ServerStyleSheet } from "styled-components";
+import { extractCritical } from "emotion-server";
 import favicons from "../lib/utils/favicons";
 
 /**
@@ -35,8 +36,13 @@ class HTMLDocument extends Document {
 
     const styledComponentsStyleTags = sheet.getStyleElement();
 
+    // For ReactiveSearch styles
+    const { css, ids } = extractCritical(page.html);
+
     return {
       ...page,
+      css,
+      ids,
       pageContext,
       helmet: Helmet.rewind(),
       styles: (
@@ -53,6 +59,15 @@ class HTMLDocument extends Document {
       styledComponentsStyleTags
     };
   };
+
+  constructor(props) {
+    // For ReactiveSearch styles
+    super(props);
+    const { __NEXT_DATA__, ids } = props;
+    if (ids) {
+      __NEXT_DATA__.ids = ids;
+    }
+  }
 
   render() {
     const { helmet, pageContext, styledComponentsStyleTags } = this.props;
@@ -101,6 +116,8 @@ class HTMLDocument extends Document {
         {helmet.script.toComponent()}
         {helmet.noscript.toComponent()}
         {styledComponentsStyleTags}
+        {/* for ReactiveSearch styles */}
+        <style dangerouslySetInnerHTML={{ __html: this.props.css }} />
       </Head>
       <body>
         <Main />
