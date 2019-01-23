@@ -12,6 +12,7 @@ import { NavigationMobile, NavigationToggleMobile } from "components/NavigationM
 import AccountDropdown from "components/AccountDropdown";
 import ShopLogo from "@reactioncommerce/components/ShopLogo/v1";
 import Link from "components/Link";
+import { Router } from "routes";
 import MiniCart from "components/MiniCart";
 
 const styles = (theme) => ({
@@ -62,6 +63,12 @@ class Header extends Component {
     this.props.uiStore.toggleMenuDrawerOpen();
   };
 
+  handleSearch = (event) => {
+    if (event.keyCode === 13) {
+      Router.pushRoute(`/?q=${event.target.value}`)
+    }
+  }
+
   render() {
     const { classes, shop } = this.props;
 
@@ -84,7 +91,12 @@ class Header extends Component {
             </Hidden>
           </div>
           <div className={classes.search}>
-            <DataSearch componentId="catalogSearchBox" dataField={["product.title"]} />
+            <DataSearch 
+              componentId="catalogSearchBox" 
+              dataField={["product.title"]} 
+              onKeyDown={this.handleSearch}
+              URLParams={true}
+            />
           </div>
           <AccountDropdown />
           <MiniCart />
