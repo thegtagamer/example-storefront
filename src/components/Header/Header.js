@@ -60,12 +60,13 @@ class Header extends Component {
     this.props.uiStore.toggleMenuDrawerOpen();
   };
 
-  handleSearch = (event) => {
+  handleSearch = ({ keyCode, target }) => {
     // Send user to grid page when the enter key is pressed.
     // The current search string will be appended to the URL as
     // a query param.
-    if (event.keyCode === 13) {
-      Router.pushRoute(`/?q=${event.target.value}`)
+    if (keyCode === 13) {
+      const query = target.value;
+      query === "" ? Router.pushRoute("/") : Router.pushRoute(`/?q=${query}`)
     }
   }
 
