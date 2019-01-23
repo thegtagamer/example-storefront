@@ -84,7 +84,6 @@ export default class ProductGrid extends Component {
             and: ["catalogSearchBox"]
           }}
           size={20}
-          stream={true}
           target="_self"
         />
       </Fragment>

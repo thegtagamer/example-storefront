@@ -26,9 +26,6 @@ const styles = (theme) => ({
     display: "inherit",
     flex: 1
   },
-  search: {
-    maxWidth: "400px"
-  },
   title: {
     color: theme.palette.reaction.reactionBlue,
     marginRight: theme.spacing.unit,
@@ -64,6 +61,9 @@ class Header extends Component {
   };
 
   handleSearch = (event) => {
+    // Send user to grid page when the enter key is pressed.
+    // The current search string will be appended to the URL as
+    // a query param.
     if (event.keyCode === 13) {
       Router.pushRoute(`/?q=${event.target.value}`)
     }
@@ -90,14 +90,13 @@ class Header extends Component {
               <NavigationDesktop />
             </Hidden>
           </div>
-          <div className={classes.search}>
-            <DataSearch 
-              componentId="catalogSearchBox" 
-              dataField={["product.title"]} 
-              onKeyDown={this.handleSearch}
-              URLParams={true}
-            />
-          </div>
+          <DataSearch 
+            componentId="catalogSearchBox"
+            dataField={["product.title"]}
+            onKeyDown={this.handleSearch}
+            placeholder="What can we help you find?"
+            style={{ width: "400px" }}
+          />
           <AccountDropdown />
           <MiniCart />
         </Toolbar>
