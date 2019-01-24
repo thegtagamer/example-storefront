@@ -22,6 +22,7 @@ import components from "../custom/componentsContext";
 import componentTheme from "../custom/componentTheme";
 import buildNavFromTags from "../lib/data/buildNavFromTags";
 import getAllTags from "../lib/data/getAllTags";
+import { reactiveSearchSettings } from "./productGrid";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -80,8 +81,8 @@ export default class App extends NextApp {
             <JssProvider registry={this.pageContext.sheetsRegistry} generateClassName={this.pageContext.generateClassName}>
               <RuiThemeProvider theme={componentTheme}>
                 <ReactiveBase 
-                  app="catalog" 
-                  url="http://elasticsearch.api.reaction.localhost:9200"
+                  {...reactiveSearchSettings} 
+                  initialState={pageProps.searchInitData}
                 >
                   <MuiThemeProvider theme={this.pageContext.theme} sheetsManager={this.pageContext.sheetsManager}>
                     <CssBaseline />

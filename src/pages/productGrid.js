@@ -3,9 +3,18 @@ import PropTypes from "prop-types";
 import { observer, inject } from "mobx-react";
 import Helmet from "react-helmet";
 import withCatalogItems from "containers/catalog/withCatalogItems";
-import ProductGrid from "components/ProductGrid";
 import trackProductListViewed from "lib/tracking/trackProductListViewed";
 import { inPageSizes } from "lib/utils/pageSizes";
+import { DataSearch, ResultCard } from "@appbaseio/reactivesearch";
+import { searchInputProps } from "components/SearchInput";
+import ProductGrid, { searchResultCardProps } from "components/ProductGrid";
+import initReactivesearch from "@appbaseio/reactivesearch/lib/server";
+import { reactivesearchSettings } from "./productGrid";
+
+export const reactiveSearchSettings = {
+  app: "catalog",
+  url: "http://elasticsearch.api.reaction.localhost:9200"
+};
 
 @withCatalogItems
 @inject("routingStore", "uiStore")
@@ -24,10 +33,10 @@ class ProductGridPage extends Component {
     }),
     tag: PropTypes.object,
     uiStore: PropTypes.shape({
-      pageSize: PropTypes.number.isRequired,
-      setPageSize: PropTypes.func.isRequired,
-      setSortBy: PropTypes.func.isRequired,
-      sortBy: PropTypes.string.isRequired
+      // pageSize: PropTypes.number.isRequired,
+      // setPageSize: PropTypes.func.isRequired,
+      // setSortBy: PropTypes.func.isRequired,
+      // sortBy: PropTypes.string.isRequired
     })
   };
 
@@ -37,7 +46,24 @@ class ProductGridPage extends Component {
     const userAgent = req ? req.headers["user-agent"] : navigator.userAgent;
     const width = (userAgent && userAgent.indexOf("Mobi")) > -1 ? 320 : 1024;
 
-    return { initialGridSize: { width } };
+    const searchInitData = await initReactivesearch(
+      [
+        {
+          ...searchInputProps,
+          type: "DataSearch",
+          source: DataSearch
+        },
+        {
+          ...searchResultCardProps,
+          type: "ResultCard",
+          source: ResultCard
+        }
+      ],
+      null,
+      reactiveSearchSettings,
+    );
+
+    return { initialGridSize: { width }, searchInitData };
   }
 
   @trackProductListViewed()
@@ -85,17 +111,7 @@ class ProductGridPage extends Component {
           title={pageTitle}
           meta={[{ name: "description", content: shop && shop.description }]}
         />
-        <ProductGrid
-          catalogItems={catalogItems}
-          currencyCode={shop.currency.code}
-          initialSize={initialGridSize}
-          isLoadingCatalogItems={isLoadingCatalogItems}
-          pageInfo={catalogItemsPageInfo}
-          pageSize={pageSize}
-          setPageSize={this.setPageSize}
-          setSortBy={this.setSortBy}
-          sortBy={sortBy}
-        />
+        <ProductGrid />
       </Fragment>
     );
   }

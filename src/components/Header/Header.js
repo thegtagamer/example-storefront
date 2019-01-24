@@ -5,15 +5,14 @@ import AppBar from "@material-ui/core/AppBar";
 import Hidden from "@material-ui/core/Hidden";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import { DataSearch } from "@appbaseio/reactivesearch";
 import { withStyles } from "@material-ui/core/styles";
 import { NavigationDesktop } from "components/NavigationDesktop";
 import { NavigationMobile, NavigationToggleMobile } from "components/NavigationMobile";
 import AccountDropdown from "components/AccountDropdown";
 import ShopLogo from "@reactioncommerce/components/ShopLogo/v1";
 import Link from "components/Link";
-import { Router } from "routes";
 import MiniCart from "components/MiniCart";
+import SearchInput from "components/SearchInput";
 
 const styles = (theme) => ({
   appBar: {
@@ -60,16 +59,6 @@ class Header extends Component {
     this.props.uiStore.toggleMenuDrawerOpen();
   };
 
-  handleSearch = ({ keyCode, target }) => {
-    // Send user to grid page when the enter key is pressed.
-    // The current search string will be appended to the URL as
-    // a query param.
-    if (keyCode === 13) {
-      const query = target.value;
-      query === "" ? Router.pushRoute("/") : Router.pushRoute(`/?q=${query}`)
-    }
-  }
-
   render() {
     const { classes, shop } = this.props;
 
@@ -91,13 +80,7 @@ class Header extends Component {
               <NavigationDesktop />
             </Hidden>
           </div>
-          <DataSearch 
-            componentId="catalogSearchBox"
-            dataField={["product.title"]}
-            onKeyDown={this.handleSearch}
-            placeholder="What can we help you find?"
-            style={{ width: "400px" }}
-          />
+          <SearchInput />
           <AccountDropdown />
           <MiniCart />
         </Toolbar>

@@ -20,13 +20,36 @@ const styles = (theme) => ({
   }
 });
 
+export const searchResultCardProps = {
+  componentId: "searchResultCard",
+  dataField: "product.title",
+  size: 20,
+  onData: res =>
+    ({
+      description: res.product.vendor,
+      image: `http://localhost:3000/${res.product.media[0].URLs.small}`,
+      title: (
+        <div>
+          {res.product.title}
+          {res.product.pricing.USD.displayPrice}
+        </div>
+      ),
+      url: `/product/${res.product.slug}`
+    }),
+  pagination: true,
+  react: {
+    and: ["SearchInput"]
+  },
+  target: "_self"
+};
+
 @withStyles(styles, { name: "SkProductGrid" })
 @track()
 export default class ProductGrid extends Component {
   static propTypes = {
     catalogItems: PropTypes.arrayOf(PropTypes.object),
     classes: PropTypes.object,
-    currencyCode: PropTypes.string.isRequired,
+    // currencyCode: PropTypes.string.isRequired,
     initialSize: PropTypes.object,
     isLoadingCatalogItems: PropTypes.bool,
     pageInfo: PropTypes.shape({
@@ -37,10 +60,10 @@ export default class ProductGrid extends Component {
       loadNextPage: PropTypes.func,
       loadPreviousPage: PropTypes.func
     }),
-    pageSize: PropTypes.number.isRequired,
-    setPageSize: PropTypes.func.isRequired,
-    setSortBy: PropTypes.func.isRequired,
-    sortBy: PropTypes.string.isRequired
+    // pageSize: PropTypes.number.isRequired,
+    // setPageSize: PropTypes.func.isRequired,
+    // setSortBy: PropTypes.func.isRequired,
+    // sortBy: PropTypes.string.isRequired
   };
 
   renderFilters() {
@@ -65,28 +88,13 @@ export default class ProductGrid extends Component {
     const { classes } = this.props;
 
     return (
-      <Fragment>
-        <ResultCard
-          className={classes.resultCard}
-          componentId="catalogSearchResults"
-          dataField="product.title"
-          innerClass={{
-            listItem: "resultImage"
-          }}
-          onData={(res) => ({
-            description: res.product.vendor,
-            image: `http://localhost:3000/${res.product.media[0].URLs.small}`,
-            title: <div>{res.product.title}{res.product.pricing.USD.displayPrice}</div>,
-            url: `/product/${res.product.slug}`
-          })}
-          pagination={true}
-          react={{
-            and: ["catalogSearchBox"]
-          }}
-          size={20}
-          target="_self"
-        />
-      </Fragment>
+      <ResultCard
+        {
+        ...searchResultCardProps
+        }
+        className={classes.resultCard}
+        innerClass={{ listItem: "resultImage" }}
+      />
     );
   }
 }
