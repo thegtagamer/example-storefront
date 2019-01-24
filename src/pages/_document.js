@@ -120,7 +120,7 @@ class HTMLDocument extends Document {
         {helmet.script.toComponent()}
         {helmet.noscript.toComponent()}
         {styledComponentsStyleTags}
-        {/* ReactiveSearch styles */}
+        {/* ReactiveSearch styles eslint-disable-next-line react/no-danger */}
         <style dangerouslySetInnerHTML={{ __html: this.props.css }} />
       </Head>
       <body>
