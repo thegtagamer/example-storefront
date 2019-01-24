@@ -1,18 +1,11 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Grid from "@material-ui/core/Grid";
 import { ResultCard } from "@appbaseio/reactivesearch";
 import { withStyles } from "@material-ui/core/styles";
 import track from "lib/tracking/track";
 import trackProductClicked from "lib/tracking/trackProductClicked";
-import PageSizeSelector from "components/PageSizeSelector";
-import SortBySelector from "components/SortBySelector";
 
-const styles = (theme) => ({
-  filters: {
-    justifyContent: "flex-end",
-    marginBottom: theme.spacing.unit * 2
-  },
+const styles = () => ({
   resultCard: {
     "& .resultImage": {
       boxShadow: "none"
@@ -23,7 +16,7 @@ const styles = (theme) => ({
 export const searchResultCardProps = {
   componentId: "searchResultCard",
   dataField: "product.title",
-  size: 20,
+  size: 1,
   onData: (res) =>
     ({
       description: res.product.vendor,
@@ -38,7 +31,7 @@ export const searchResultCardProps = {
     }),
   pagination: true,
   react: {
-    and: ["SearchInput"]
+    and: ["search"]
   },
   target: "_self"
 };
@@ -47,39 +40,8 @@ export const searchResultCardProps = {
 @track()
 export default class ProductGrid extends Component {
   static propTypes = {
-    catalogItems: PropTypes.arrayOf(PropTypes.object),
-    classes: PropTypes.object,
-    // currencyCode: PropTypes.string.isRequired,
-    initialSize: PropTypes.object,
-    isLoadingCatalogItems: PropTypes.bool,
-    pageInfo: PropTypes.shape({
-      startCursor: PropTypes.string,
-      endCursor: PropTypes.string,
-      hasNextPage: PropTypes.bool,
-      hasPreviousPage: PropTypes.bool,
-      loadNextPage: PropTypes.func,
-      loadPreviousPage: PropTypes.func
-    })
-    // pageSize: PropTypes.number.isRequired,
-    // setPageSize: PropTypes.func.isRequired,
-    // setSortBy: PropTypes.func.isRequired,
-    // sortBy: PropTypes.string.isRequired
+    classes: PropTypes.object
   };
-
-  renderFilters() {
-    const { classes, pageSize, setPageSize, setSortBy, sortBy } = this.props;
-
-    return (
-      <Grid container spacing={8} className={classes.filters}>
-        <Grid item>
-          <PageSizeSelector pageSize={pageSize} onChange={setPageSize} />
-        </Grid>
-        <Grid item>
-          <SortBySelector sortBy={sortBy} onChange={setSortBy} />
-        </Grid>
-      </Grid>
-    );
-  }
 
   @trackProductClicked()
   onItemClick = (event, product) => {} // eslint-disable-line no-unused-vars
@@ -89,9 +51,7 @@ export default class ProductGrid extends Component {
 
     return (
       <ResultCard
-        {
-        ...searchResultCardProps
-        }
+        {...searchResultCardProps}
         className={classes.resultCard}
         innerClass={{ listItem: "resultImage" }}
       />

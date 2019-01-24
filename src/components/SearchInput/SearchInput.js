@@ -12,19 +12,24 @@ const styles = ({
 
 export const searchInputProps = {
   dataField: ["product.title"],
-  componentId: "SearchInput",
+  componentId: "search",
   onKeyDown: handleSearch,
   placeholder: "What can we help you find?",
-  style: { width: "400px" }
+  style: { width: "250px" }
 };
 
+/**
+ *
+ * @param {keyCode} Keyboard event key code
+ * @param {target} Target HTML element
+ * @returns {undefined} undefined
+ */
 function handleSearch({ keyCode, target }) {
   // Send user to grid page when the enter key is pressed.
-  // The current search string will be appended to the URL as
-  // a query param.
+  // The current search string will be appended to the URL as a query param.
   if (keyCode === 13) {
     const { value } = target;
-    const route = value === "" ? "/" : `/?q=${value}`;
+    const route = value === "" ? "/" : `/?search=${value}`;
     Router.pushRoute(route);
   }
 }

@@ -29,13 +29,7 @@ class ProductGridPage extends Component {
         code: PropTypes.string.isRequired
       })
     }),
-    tag: PropTypes.object,
-    uiStore: PropTypes.shape({
-      // pageSize: PropTypes.number.isRequired,
-      // setPageSize: PropTypes.func.isRequired,
-      // setSortBy: PropTypes.func.isRequired,
-      // sortBy: PropTypes.string.isRequired
-    })
+    tag: PropTypes.object
   };
 
   static async getInitialProps({ req }) {
@@ -44,6 +38,16 @@ class ProductGridPage extends Component {
     const userAgent = req ? req.headers["user-agent"] : navigator.userAgent;
     const width = (userAgent && userAgent.indexOf("Mobi")) > -1 ? 320 : 1024;
 
+    // Get search URL query params
+    let searchQueryParams = null;
+    if (req && req.query) {
+      const { query } = req;
+      if (query.search && query.search.trim() !== "") {
+        searchQueryParams = { search: query.search };
+      }
+    }
+
+    // Retrieve initial data for ReactiveSearch on the server
     const searchInitData = await initReactivesearch(
       [
         {
@@ -57,7 +61,7 @@ class ProductGridPage extends Component {
           source: ResultCard
         }
       ],
-      null,
+      searchQueryParams,
       reactiveSearchSettings,
     );
 
@@ -78,16 +82,6 @@ class ProductGridPage extends Component {
 
   @trackProductListViewed()
   trackEvent() {}
-
-  setPageSize = (pageSize) => {
-    this.props.routingStore.setSearch({ limit: pageSize });
-    this.props.uiStore.setPageSize(pageSize);
-  };
-
-  setSortBy = (sortBy) => {
-    this.props.routingStore.setSearch({ sortby: sortBy });
-    this.props.uiStore.setSortBy(sortBy);
-  };
 
   render() {
     const {
