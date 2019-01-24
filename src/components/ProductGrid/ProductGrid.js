@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Grid from "@material-ui/core/Grid";
 import { ResultCard } from "@appbaseio/reactivesearch";
@@ -24,7 +24,7 @@ export const searchResultCardProps = {
   componentId: "searchResultCard",
   dataField: "product.title",
   size: 20,
-  onData: res =>
+  onData: (res) =>
     ({
       description: res.product.vendor,
       image: `http://localhost:3000/${res.product.media[0].URLs.small}`,
@@ -59,7 +59,7 @@ export default class ProductGrid extends Component {
       hasPreviousPage: PropTypes.bool,
       loadNextPage: PropTypes.func,
       loadPreviousPage: PropTypes.func
-    }),
+    })
     // pageSize: PropTypes.number.isRequired,
     // setPageSize: PropTypes.func.isRequired,
     // setSortBy: PropTypes.func.isRequired,

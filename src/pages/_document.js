@@ -120,8 +120,8 @@ class HTMLDocument extends Document {
         {helmet.script.toComponent()}
         {helmet.noscript.toComponent()}
         {styledComponentsStyleTags}
-          {/* ReactiveSearch styles */}
-          <style dangerouslySetInnerHTML={{ __html: this.props.css }} />
+        {/* ReactiveSearch styles */}
+        <style dangerouslySetInnerHTML={{ __html: this.props.css }} />
       </Head>
       <body>
         <Main />

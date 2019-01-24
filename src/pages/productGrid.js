@@ -4,12 +4,10 @@ import { observer, inject } from "mobx-react";
 import Helmet from "react-helmet";
 import withCatalogItems from "containers/catalog/withCatalogItems";
 import trackProductListViewed from "lib/tracking/trackProductListViewed";
-import { inPageSizes } from "lib/utils/pageSizes";
 import { DataSearch, ResultCard } from "@appbaseio/reactivesearch";
 import { searchInputProps } from "components/SearchInput";
 import ProductGrid, { searchResultCardProps } from "components/ProductGrid";
 import initReactivesearch from "@appbaseio/reactivesearch/lib/server";
-import { reactivesearchSettings } from "./productGrid";
 
 export const reactiveSearchSettings = {
   app: "catalog",
@@ -93,16 +91,8 @@ class ProductGridPage extends Component {
 
   render() {
     const {
-      catalogItems,
-      catalogItemsPageInfo,
-      initialGridSize,
-      isLoadingCatalogItems,
-      routingStore: { query },
-      shop,
-      uiStore
+      shop
     } = this.props;
-    const pageSize = query && inPageSizes(query.limit) ? parseInt(query.limit, 10) : uiStore.pageSize;
-    const sortBy = query && query.sortby ? query.sortby : uiStore.sortBy;
     const pageTitle = shop && shop.description ? `${shop.name} | ${shop.description}` : shop.name;
 
     return (

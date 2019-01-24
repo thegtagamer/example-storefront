@@ -13,13 +13,12 @@ const styles = ({
 export const searchInputProps = {
   dataField: ["product.title"],
   componentId: "SearchInput",
-  style: { maxWidth: "400px" },
   onKeyDown: handleSearch,
   placeholder: "What can we help you find?",
-  style : { width: "400px" }
+  style: { width: "400px" }
 };
 
-function handleSearch ({ keyCode, target }) {
+function handleSearch({ keyCode, target }) {
   // Send user to grid page when the enter key is pressed.
   // The current search string will be appended to the URL as
   // a query param.

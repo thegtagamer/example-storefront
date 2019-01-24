@@ -76,27 +76,27 @@ export default class App extends NextApp {
     const { stripe } = this.state;
 
     return <Container>
-        <ComponentsProvider value={components}>
-          <MobxProvider suppressChangedStoreWarning navItems={navItems} tags={tags}>
-            <JssProvider registry={this.pageContext.sheetsRegistry} generateClassName={this.pageContext.generateClassName}>
-              <RuiThemeProvider theme={componentTheme}>
-                <ReactiveBase 
-                  {...reactiveSearchSettings} 
-                  initialState={pageProps.searchInitData}
-                >
-                  <MuiThemeProvider theme={this.pageContext.theme} sheetsManager={this.pageContext.sheetsManager}>
-                    <CssBaseline />
-                    {route === "/checkout" || route === "/login" ? <StripeProvider stripe={stripe}>
-                        <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
-                      </StripeProvider> : <Layout shop={shop} viewer={viewer}>
-                        <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
-                      </Layout>}
-                  </MuiThemeProvider>
-                </ReactiveBase>
-              </RuiThemeProvider>
-            </JssProvider>
-          </MobxProvider>
-        </ComponentsProvider>
-      </Container>;
+      <ComponentsProvider value={components}>
+        <MobxProvider suppressChangedStoreWarning navItems={navItems} tags={tags}>
+          <JssProvider registry={this.pageContext.sheetsRegistry} generateClassName={this.pageContext.generateClassName}>
+            <RuiThemeProvider theme={componentTheme}>
+              <ReactiveBase
+                {...reactiveSearchSettings}
+                initialState={pageProps.searchInitData}
+              >
+                <MuiThemeProvider theme={this.pageContext.theme} sheetsManager={this.pageContext.sheetsManager}>
+                  <CssBaseline />
+                  {route === "/checkout" || route === "/login" ? <StripeProvider stripe={stripe}>
+                    <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
+                  </StripeProvider> : <Layout shop={shop} viewer={viewer}>
+                    <Component pageContext={this.pageContext} shop={shop} {...rest} {...pageProps} />
+                  </Layout>}
+                </MuiThemeProvider>
+              </ReactiveBase>
+            </RuiThemeProvider>
+          </JssProvider>
+        </MobxProvider>
+      </ComponentsProvider>
+    </Container>;
   }
 }
