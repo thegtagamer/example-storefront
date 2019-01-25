@@ -16,7 +16,7 @@ const styles = () => ({
 export const searchResultCardProps = {
   componentId: "searchResultCard",
   dataField: "product.title",
-  size: 1,
+  size: 20,
   onData: (res) =>
     ({
       description: res.product.vendor,
