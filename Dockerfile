@@ -54,19 +54,25 @@ LABEL maintainer="Reaction Commerce <engineering@reactioncommerce.com>" \
       com.reactioncommerce.docker.git.sha1=$GIT_SHA1 \
       com.reactioncommerce.docker.license=$LICENSE
 
-RUN apk --no-cache add bash curl less vim
+# shadow and su-exec are used by bin/start-root (shadow provides usermod)
+# hadolint ignore=DL3018
+RUN apk --no-cache add bash curl less shadow su-exec vim
 SHELL ["/bin/bash", "-o", "pipefail", "-o", "errexit", "-u", "-c"]
 
 # Because Docker Compose uses a volume for node_modules and volumes are owned
 # by root by default, we have to initially create node_modules here with correct owner.
 # Without this Yarn cannot write packages into node_modules later, when running in a container.
-RUN mkdir -p "/usr/local/src/node_modules"; chown node "/usr/local/src"; chown node "/usr/local/src/node_modules"
-RUN mkdir -p "/usr/local/src/reaction-app/node_modules"; chown node "/usr/local/src/reaction-app"; chown node "/usr/local/src/reaction-app/node_modules"
-
-# Same for Yarn cache folder. Without this Yarn will warn that it's going to use
-# a fallback cache dir instead because the one in config is not writable.
-RUN mkdir -p "/home/node/.cache/yarn"; chown node "/home/node/.cache/yarn"
-RUN mkdir -p "/home/node/.cache/yarn-offline-mirror"; chown node "/home/node/.cache/yarn-offline-mirror"
+RUN volumes=( \
+  /usr/local/src \
+  /usr/local/src/node_modules \
+  /usr/local/src/reaction-app \
+  /usr/local/src/reaction-app/node_modules \
+  /home/node/.cache/yarn \
+  /home/node/.cache/yarn-offline-mirror) ; \
+  for dir in ${volumes[*]}; do \
+    mkdir -p "${dir}"; \
+    chown node "${dir}"; \
+  done
 
 WORKDIR $APP_SOURCE_DIR/..
 COPY --chown=node package.json yarn.lock $APP_SOURCE_DIR/../
@@ -113,4 +119,6 @@ RUN if [ "$BUILD_ENV" = "production" ]; then \
     yarn build; \
   fi;
 
-CMD ["yarn", "start"]
+# hadolint ignore=DL3002
+USER root
+ENTRYPOINT ["./.reaction/entrypoint.sh"]
