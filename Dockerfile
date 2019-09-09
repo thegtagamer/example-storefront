@@ -77,6 +77,10 @@ RUN volumes=( \
 WORKDIR $APP_SOURCE_DIR/..
 COPY --chown=node:node package.json yarn.lock $APP_SOURCE_DIR/../
 
+# Important: Make sure we're the "node" user before we begin doing things because
+# our tools use "/home/node" as the HOME dir.
+USER node
+
 # Build the dependencies into the Docker image in a cacheable way. Dependencies
 # are only rebuilt when package.json or yarn.lock is modified.
 #
@@ -110,10 +114,6 @@ COPY --chown=node:node ./.reaction/yarnrc-docker.template /home/node/.yarnrc
 
 WORKDIR $APP_SOURCE_DIR
 COPY --chown=node:node . $APP_SOURCE_DIR
-
-# Important: Make sure we're the "node" user before we begin doing things because
-# our tools use "/home/node" as the HOME dir.
-USER node
 
 RUN if [ "$BUILD_ENV" = "production" ]; then \
     yarn build; \
