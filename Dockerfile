@@ -71,11 +71,11 @@ RUN volumes=( \
   /home/node/.cache/yarn-offline-mirror) ; \
   for dir in ${volumes[*]}; do \
     mkdir -p "${dir}"; \
-    chown node "${dir}"; \
+    chown node:node "${dir}"; \
   done
 
 WORKDIR $APP_SOURCE_DIR/..
-COPY --chown=node package.json yarn.lock $APP_SOURCE_DIR/../
+COPY --chown=node:node package.json yarn.lock $APP_SOURCE_DIR/../
 
 # Build the dependencies into the Docker image in a cacheable way. Dependencies
 # are only rebuilt when package.json or yarn.lock is modified.
@@ -106,10 +106,10 @@ RUN if [ "$BUILD_ENV" = "production" ]; then \
 # link in host files, so we create it as the user-level config.
 # Note that this will be copied in for a prod build, too, but since
 # we already ran yarn install above, it doesn't matter.
-COPY --chown=node ./.reaction/yarnrc-docker.template /home/node/.yarnrc
+COPY --chown=node:node ./.reaction/yarnrc-docker.template /home/node/.yarnrc
 
 WORKDIR $APP_SOURCE_DIR
-COPY --chown=node . $APP_SOURCE_DIR
+COPY --chown=node:node . $APP_SOURCE_DIR
 
 # Important: Make sure we're the "node" user before we begin doing things because
 # our tools use "/home/node" as the HOME dir.
