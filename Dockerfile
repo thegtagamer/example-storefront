@@ -1,6 +1,6 @@
 FROM node:10-alpine
 # hadolint ignore=DL3018
-RUN apk --no-cache add bash curl less vim tini
+RUN apk --no-cache add bash curl less tini vim
 SHELL ["/bin/bash", "-o", "pipefail", "-o", "errexit", "-u", "-c"]
 WORKDIR /usr/local/src/reaction-app
 # allow yarn to created ./node_modules
