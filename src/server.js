@@ -17,45 +17,52 @@ const app = nextApp({
   dev: config.isDev,
   dir: "./src"
 });
-
+let server;
+process.on("SIGTERM", () => {
+  server && server.close();
+});
 useStaticRendering(true);
 
 app
   .prepare()
   .then(() => {
-    const server = express();
+    const expressApp = express();
 
-    server.use(compression());
+    expressApp.use(compression());
 
     // We use a client-side cookie session instead of a server session so that there are no
     // issues when load balancing without sticky sessions.
     // https://www.npmjs.com/package/cookie-session
-    server.use(cookieSession({
+    expressApp.use(cookieSession({
       // https://www.npmjs.com/package/cookie-session#options
       keys: [config.SESSION_SECRET],
       maxAge: config.SESSION_MAX_AGE_MS,
       name: "storefront-session"
     }));
-    server.use(cookieParser());
+    expressApp.use(cookieParser());
 
-    configureAuthForServer(server);
+    configureAuthForServer(expressApp);
 
     // add graphiql redirects to EXTERNAL_GRAPHQL_URL
-    server.get(["/graphiql", "/graphql-beta", "/graphql-alpha", "/graphql"], (req, res) => {
-      res.redirect(301, config.EXTERNAL_GRAPHQL_URL);
-    });
+    expressApp.get(
+      ["/graphiql", "/graphql-beta", "/graphql-alpha", "/graphql"],
+      (req, res) => {
+        res.redirect(301, config.EXTERNAL_GRAPHQL_URL);
+      }
+    );
 
     // apply to routes starting with "/sitemap" and ending with ".xml"
-    server.use(/^\/sitemap.*\.xml$/, sitemapRoutesHandler);
+    expressApp.use(/^\/sitemap.*\.xml$/, sitemapRoutesHandler);
 
     // Setup next routes
     const routeHandler = router.getRequestHandler(app);
-    server.use(routeHandler);
+    expressApp.use(routeHandler);
 
-    return server.listen(config.PORT, (err) => {
+    server = expressApp.listen(config.PORT, (err) => {
       if (err) throw err;
       logger.appStarted("localhost", config.PORT);
     });
+    return null;
   })
   .catch((ex) => {
     logger.error(ex.stack);
