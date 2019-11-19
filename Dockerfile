@@ -23,7 +23,8 @@ COPY --chown=node:node .babelrc ./
 USER node
 
 # Install ALL dependencies. We need devDependencies for the build command.
-RUN yarn install --production=false --frozen-lockfile --ignore-scripts --non-interactive --no-cache
+# RUN yarn install --production=false --frozen-lockfile --ignore-scripts --non-interactive --no-cache
+RUN yarn install --production=false --ignore-scripts --non-interactive --no-cache
 
 ENV BUILD_ENV=production NODE_ENV=production
 RUN IS_BUILDING_NEXTJS=1 "$(npm bin)/next" build src
@@ -31,7 +32,8 @@ RUN IS_BUILDING_NEXTJS=1 "$(npm bin)/next" build src
 # Install only prod dependencies now that we've built, to make the image smaller
 RUN rm -rf node_modules/*
 RUN rm ./.babelrc
-RUN yarn install --production=true --frozen-lockfile --ignore-scripts --non-interactive
+#RUN yarn install --production=true --frozen-lockfile --ignore-scripts --non-interactive
+RUN yarn install --production=true --ignore-scripts --non-interactive
 
 # If any Node flags are needed, they can be set in the NODE_OPTIONS env variable.
 CMD ["tini", "--", "node", "."]
