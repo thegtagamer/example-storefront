@@ -1,7 +1,7 @@
 // Honeycomb instrumentation for distributed tracing
 require("honeycomb-beeline")({
-    writeKey: "bc676dd5ac6b269eaed4008673b318bd",
-    dataset: "storefront"
+  writeKey: "bc676dd5ac6b269eaed4008673b318bd",
+  dataset: "storefront"
 });
 
 const cookieParser = require("cookie-parser");
