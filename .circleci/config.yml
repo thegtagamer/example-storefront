@@ -30,7 +30,8 @@ jobs:
             - reaction-v3-node-modules-{{ .Branch }}
       - run:
           name: Install NPM dependencies
-          command: yarn install --production=false --frozen-lockfile --non-interactive
+          #command: yarn install --production=false --frozen-lockfile --non-interactive
+          command: yarn install --production=false --non-interactive
       - save_cache:
           key: reaction-v3-node-modules-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
           paths:
