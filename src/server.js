@@ -1,23 +1,21 @@
-const compression = require("compression");
-const nextApp = require("next");
-const { useStaticRendering } = require("mobx-react");
-const config = require("./config");
-const logger = require("./lib/logger");
-
-if (config.ENABLE_HONEYCOMB_INSTRUMENTATION) {
-  logger.info("Enabling Honeycomb instrumentation for distributed tracing...");
+if (process.env.ENABLE_HONEYCOMB_INSTRUMENTATION) {
   require("honeycomb-beeline")({
-    writeKey: config.HONEYCOMB_WRITE_KEY,
-    dataset: config.HONEYCOMB_DATASET
+    writeKey: process.env.HONEYCOMB_WRITE_KEY,
+    dataset: process.env.HONEYCOMB_DATASET
   });
 }
 
 const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
 const express = require("express");
+const compression = require("compression");
+const nextApp = require("next");
+const { useStaticRendering } = require("mobx-react");
+const config = require("./config");
+const logger = require("./lib/logger");
 const router = require("./routes");
 const { configureAuthForServer } = require("./serverAuth");
-const { sitemapRoutesHandler } = require("./sitemapRoutesHandler");
+const { sitemapRoutesHandler } = require("./sitemapRoutesHandler")
 
 if (config.isDev) {
   logger.info("Running NextJS server in development mode...");
