@@ -15,7 +15,7 @@ const config = require("./config");
 const logger = require("./lib/logger");
 const router = require("./routes");
 const { configureAuthForServer } = require("./serverAuth");
-const { sitemapRoutesHandler } = require("./sitemapRoutesHandler")
+const { sitemapRoutesHandler } = require("./sitemapRoutesHandler");
 
 if (config.isDev) {
   logger.info("Running NextJS server in development mode...");
