@@ -1,3 +1,4 @@
+const nextApp = require("next");
 const { useStaticRendering } = require("mobx-react");
 const config = require("./config");
 const logger = require("./lib/logger");
@@ -14,7 +15,6 @@ const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
 const express = require("express");
 const compression = require("compression");
-const nextApp = require("next");
 const router = require("./routes");
 const { configureAuthForServer } = require("./serverAuth");
 const { sitemapRoutesHandler } = require("./sitemapRoutesHandler");
