@@ -54,7 +54,7 @@
     "express": "~4.16.4",
     "graphql": "~14.1.1",
     "graphql-tag": "~2.10.1",
-    "honeycomb-beeline": "~1.8.3",
+    "honeycomb-beeline": "^1.8.3",
     "isomorphic-fetch": "~2.2.1",
     "js-cookie": "~2.2.0",
     "keymirror": "~0.1.1",

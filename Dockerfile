@@ -32,8 +32,7 @@ RUN IS_BUILDING_NEXTJS=1 "$(npm bin)/next" build src
 # Install only prod dependencies now that we've built, to make the image smaller
 RUN rm -rf node_modules/*
 RUN rm ./.babelrc
-#RUN yarn install --production=true --frozen-lockfile --ignore-scripts --non-interactive
-RUN yarn install --production=true --ignore-scripts --non-interactive
+RUN yarn install --production=true --frozen-lockfile --ignore-scripts --non-interactive
 
 # If any Node flags are needed, they can be set in the NODE_OPTIONS env variable.
 CMD ["tini", "--", "node", "."]

@@ -29,8 +29,11 @@ if (process.env.IS_BUILDING_NEXTJS) {
    */
   module.exports = envalid.cleanEnv(process.env, {
     CANONICAL_URL: url(),
+    ENABLE_HONEYCOMB_INSTRUMENTATION: bool({ default: false }), 
     ENABLE_SPA_ROUTING: bool({ default: true }), // must explicitly set to false to disable
     EXTERNAL_GRAPHQL_URL: url(),
+    HONEYCOMB_DATASET: str({default: null}),
+    HONEYCOMB_WRITE_KEY: str({default: null}),
     INTERNAL_GRAPHQL_URL: url(),
     NODE_ENV: str({ choices: ["development", "test", "jesttest", "production"], default: "production" }),
     OAUTH2_AUTH_URL: url(),

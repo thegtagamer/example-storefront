@@ -1,8 +1,13 @@
-// Honeycomb instrumentation for distributed tracing
-require("honeycomb-beeline")({
-  writeKey: "bc676dd5ac6b269eaed4008673b318bd",
-  dataset: "storefront"
-});
+const config = require("./config");
+const logger = require("./lib/logger");
+
+if (config.ENABLE_HONEYCOMB_INSTRUMENTATION) {
+  logger.info("Enabling Honeycomb instrumentation for distributed tracing...");
+  require("honeycomb-beeline")({
+    writeKey: config.HONEYCOMB_WRITE_KEY,
+    dataset: config.HONEYCOMB_DATASET
+  });
+}
 
 const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
@@ -10,8 +15,6 @@ const express = require("express");
 const compression = require("compression");
 const nextApp = require("next");
 const { useStaticRendering } = require("mobx-react");
-const config = require("./config");
-const logger = require("./lib/logger");
 const router = require("./routes");
 const { configureAuthForServer } = require("./serverAuth");
 const { sitemapRoutesHandler } = require("./sitemapRoutesHandler");
