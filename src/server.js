@@ -1,3 +1,4 @@
+const compression = require("compression");
 const nextApp = require("next");
 const { useStaticRendering } = require("mobx-react");
 const config = require("./config");
@@ -14,7 +15,6 @@ if (config.ENABLE_HONEYCOMB_INSTRUMENTATION) {
 const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
 const express = require("express");
-const compression = require("compression");
 const router = require("./routes");
 const { configureAuthForServer } = require("./serverAuth");
 const { sitemapRoutesHandler } = require("./sitemapRoutesHandler");
