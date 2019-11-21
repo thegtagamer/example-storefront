@@ -1,12 +1,9 @@
 if (process.env.ENABLE_HONEYCOMB_INSTRUMENTATION === "true") {
-  console.log('Instrumenting the node app with Honeycomb');
   require("honeycomb-beeline")({
     writeKey: process.env.HONEYCOMB_WRITE_KEY,
     dataset: process.env.HONEYCOMB_DATASET
   });
-} else {
-  console.log('Not instrumenting the node app with Honeycomb');
-};
+}
 
 const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
