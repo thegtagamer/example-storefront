@@ -1,4 +1,4 @@
-if (process.env.ENABLE_HONEYCOMB_INSTRUMENTATION) {
+if (process.env.ENABLE_HONEYCOMB_INSTRUMENTATION && (process.env.ENABLE_HONEYCOMB_INSTRUMENTATION == "true")) {
   require("honeycomb-beeline")({
     writeKey: process.env.HONEYCOMB_WRITE_KEY,
     dataset: process.env.HONEYCOMB_DATASET
