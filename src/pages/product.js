@@ -83,6 +83,8 @@ class ProductDetailPage extends Component {
 
   renderMainArea() {
     const { addItemsToCart, isLoadingProduct, product, shop } = this.props;
+
+    console.log('product this.props ---->', this.props);
     const currencyCode = (shop && shop.currency.code) || "USD";
 
     if (isLoadingProduct) return <PageLoading />;

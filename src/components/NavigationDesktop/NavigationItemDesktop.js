@@ -63,7 +63,6 @@ class NavigationItemDesktop extends Component {
     const { navItem, routingStore } = this.props;
 
     const currentNavItem = (providedNavItem && providedNavItem.navigationItem) || navItem.navigationItem;
-
     return routingStore.queryString !== ""
       ? `${currentNavItem.data.url}?${routingStore.queryString}`
       : `${currentNavItem.data.url}`;
@@ -90,6 +89,7 @@ class NavigationItemDesktop extends Component {
   };
 
   renderSubNav(navItemGroup) {
+    // console.log('navItemGroup ====>', navItemGroup);
     const menuItems = navItemGroup.items.map((item, index) => {
       const { navigationItem: { data: { contentForLanguage, classNames: navigationItemClassNames, isUrlRelative, shouldOpenInNewWindow } } } = item;
       return (

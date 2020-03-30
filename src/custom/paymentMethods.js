@@ -13,6 +13,12 @@ const paymentMethods = [
     InputComponent: ExampleIOUPaymentForm,
     name: "iou_example",
     shouldCollectBillingAddress: true
+  },
+  {
+    displayName: "HDFC FSS",
+    InputComponent: StripePaymentInput,
+    name: "HDFC_card",
+    shouldCollectBillingAddress: true
   }
 ];
 

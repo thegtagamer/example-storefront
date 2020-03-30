@@ -22,9 +22,10 @@ export class NavigationDesktop extends Component {
 
   render() {
     const { navItems } = this.props;
+    // console.log('navItems -->', navItems);
 
     if (navItems && navItems.items) {
-      return <nav>{navItems.items.map(this.renderNavItem)}</nav>;
+      return <nav style={{'margin': 'auto'}}>{navItems.items.map(this.renderNavItem)}</nav>;
     }
 
     // If navItems.items aren't available, skip rendering of navigation
